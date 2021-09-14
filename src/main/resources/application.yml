@@ -48,6 +48,7 @@ elasticsearch:
   connTimeout: 10000
   socketTimeout: 10000
   connectionRequestTimeout: 2000
+  transaction-event-index-prefix: "main"
 
 logging:
   level:
