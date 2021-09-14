@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.starcoin.airdrop.data.model.StarcoinVoteChangedEvent;
 import org.starcoin.airdrop.utils.CommonUtils;
 import org.starcoin.bean.EventFull;
 import org.starcoin.types.event.VoteChangedEvent;
@@ -42,7 +43,7 @@ public class ElasticSearchService {
         this.transactionEventIndexPrefix = transactionEventIndexPrefix;
     }
 
-    public List<TransactionVoteChangedEvent> getTransactionEventsByProposalIdAndProposer(Long proposalId, String proposer, long fromTimestamp, long toTimestamp) throws IOException, DeserializationError {
+    public List<TransactionVoteChangedEvent> findTransactionEventsByProposalIdAndProposer(Long proposalId, String proposer, long fromTimestamp, long toTimestamp) throws IOException, DeserializationError {
         String transactionEventIndex = transactionEventIndexPrefix + (transactionEventIndexPrefix.endsWith(".") ? "" : ".") + TRANSACTION_EVENT_INDEX;
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
         boolQuery.must(QueryBuilders.matchQuery("tag_name", "VoteChangedEvent"));
@@ -88,6 +89,23 @@ public class ElasticSearchService {
             transactions.add(new TransactionVoteChangedEvent(event, data));
         }
         return transactions;
+    }
+
+    public static void copyProperties(TransactionVoteChangedEvent src, StarcoinVoteChangedEvent trg) {
+        trg.setBlockHash(src.event.getBlockHash());
+        trg.setBlockNumber(new BigInteger(src.event.getBlockNumber()));
+        trg.setTransactionHash(src.event.getTransactionHash());
+        trg.setTransactionIndex(BigInteger.valueOf(src.event.getTransactionIndex()));
+        trg.setEventKey(src.event.getEventKey());
+        trg.setEventSequenceNumber(new BigInteger(src.event.getEventSeqNumber()));
+        trg.setTypeTag(src.event.getTypeTag());
+        trg.setData(src.event.getData());
+        trg.setProposalId(src.getProposalId());
+        trg.setProposer(src.getProposer());
+        trg.setVoter(src.getVoter());
+        trg.setVoteAmount(src.getVoteAmount());
+        trg.setAgreeVote(src.getAgree());
+        trg.setVoteTimestamp(src.getTimestamp());
     }
 
     public static class TransactionVoteChangedEvent {
