@@ -34,7 +34,10 @@ class AirdropApplicationTests {
 		System.out.println(airdropRecords.size());
 
 		try {
-			List<ElasticSearchService.TransactionVoteChangedEvent> list = elasticSearchService.getTransactionEventsByProposalIdAndProposer(0L, "0xb2aa52f94db4516c5beecef363af850a");
+			List<ElasticSearchService.TransactionVoteChangedEvent> list = elasticSearchService
+					.getTransactionEventsByProposalIdAndProposer(0L,
+							"0xb2aa52f94db4516c5beecef363af850a",
+							0, Long.MAX_VALUE);
 			System.out.println(list.size());
 		} catch (IOException exception) {
 			exception.printStackTrace();

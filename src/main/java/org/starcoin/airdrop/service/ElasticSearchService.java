@@ -42,10 +42,11 @@ public class ElasticSearchService {
         this.transactionEventIndexPrefix = transactionEventIndexPrefix;
     }
 
-    public List<TransactionVoteChangedEvent> getTransactionEventsByProposalIdAndProposer(Long proposalId, String proposer) throws IOException, DeserializationError {
+    public List<TransactionVoteChangedEvent> getTransactionEventsByProposalIdAndProposer(Long proposalId, String proposer, long fromTimestamp, long toTimestamp) throws IOException, DeserializationError {
         String transactionEventIndex = transactionEventIndexPrefix + (transactionEventIndexPrefix.endsWith(".") ? "" : ".") + TRANSACTION_EVENT_INDEX;
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
         boolQuery.must(QueryBuilders.matchQuery("tag_name", "VoteChangedEvent"));
+        boolQuery.must(QueryBuilders.rangeQuery("timestamp").from(fromTimestamp).to(toTimestamp));
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         searchSourceBuilder.query(boolQuery);
         searchSourceBuilder.size(50);
