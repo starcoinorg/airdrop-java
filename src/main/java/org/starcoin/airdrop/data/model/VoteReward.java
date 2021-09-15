@@ -26,7 +26,13 @@ public class VoteReward {
 //    private String proposer;
 
     @Column(precision = 50, scale = 0)
+    private BigInteger voteAddedAmount;
+
+    @Column(precision = 50, scale = 0)
     private BigInteger voteAmount;
+
+    @Column(precision = 50, scale = 0)
+    private BigInteger rewardVoteAmount;
 
 //    @Column
 //    private Boolean isAgreeVote;
@@ -73,12 +79,12 @@ public class VoteReward {
         this.proposalId = proposalId;
     }
 
-    public BigInteger getVoteAmount() {
-        return voteAmount;
+    public BigInteger getVoteAddedAmount() {
+        return voteAddedAmount;
     }
 
-    public void setVoteAmount(BigInteger voteAmount) {
-        this.voteAmount = voteAmount;
+    public void setVoteAddedAmount(BigInteger voteAddedAmount) {
+        this.voteAddedAmount = voteAddedAmount;
     }
 
     public Long getVoteTimestamp() {
@@ -135,5 +141,21 @@ public class VoteReward {
 
     public void setVersion(Long version) {
         this.version = version;
+    }
+
+    public BigInteger getVoteAmount() {
+        return voteAmount;
+    }
+
+    public void setVoteAmount(BigInteger voteAmount) {
+        this.voteAmount = voteAmount;
+    }
+
+    public BigInteger getRewardVoteAmount() {
+        return rewardVoteAmount;
+    }
+
+    public void setRewardVoteAmount(BigInteger rewardVoteAmount) {
+        this.rewardVoteAmount = rewardVoteAmount;
     }
 }

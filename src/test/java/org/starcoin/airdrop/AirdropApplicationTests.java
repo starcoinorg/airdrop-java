@@ -13,6 +13,7 @@ import org.starcoin.airdrop.data.repo.StarcoinEventRepository;
 import org.starcoin.airdrop.data.repo.VoteRewardRepository;
 import org.starcoin.airdrop.service.ElasticSearchService;
 import org.starcoin.airdrop.service.StarcoinVoteChangedEventService;
+import org.starcoin.airdrop.service.VoteRewardService;
 
 import java.util.List;
 
@@ -37,14 +38,19 @@ class AirdropApplicationTests {
     @Autowired
     VoteRewardRepository voteRewardRepository;
 
+    @Autowired
+    VoteRewardService voteRewardService;
+
     @Test
     void contextLoads() {
-//        List<StarcoinVoteChangedEvent> events = starcoinEventRepository.findStarcoinVoteChangedEventsByProposalIdOrderByVoteTimestamp(0L);
+        long proposalId = 0L;
+        List<StarcoinVoteChangedEvent> events = starcoinEventRepository.findStarcoinVoteChangedEventsByProposalIdOrderByVoteTimestamp(proposalId);
+        voteRewardService.addOrUpdateVoteRewards(proposalId, events);
 //        System.out.println(events);
-        VoteReward voteReward = voteRewardRepository.findFirstByProposalIdAndVoterOrderByVoteTimestampDesc(0L, "");
-        System.out.println(voteReward);
-        List<VoteReward> voteRewards = voteRewardRepository.findByProposalIdAndVoterOrderByVoteTimestamp(0L, "");
-        System.out.println(voteRewards);
+//        VoteReward voteReward = voteRewardRepository.findFirstByProposalIdAndVoterOrderByVoteTimestampDesc(0L, "");
+//        System.out.println(voteReward);
+//        List<VoteReward> voteRewards = voteRewardRepository.findByProposalIdAndVoterOrderByVoteTimestamp(0L, "");
+//        System.out.println(voteRewards);
 
         if (true) return;
         List<AirdropProject> airdropProjects = airdropProjectRepository.findAll();
