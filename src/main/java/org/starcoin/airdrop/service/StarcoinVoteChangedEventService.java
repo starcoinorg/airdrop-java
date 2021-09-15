@@ -41,7 +41,12 @@ public class StarcoinVoteChangedEventService {
             trg.setCreatedBy("admin");
             trg.setUpdatedAt(trg.getCreatedAt());
             trg.setUpdatedBy(trg.getCreatedBy());
-            starcoinEventRepository.save(trg);
+            try {
+                starcoinEventRepository.save(trg);
+            } catch (org.springframework.dao.DataIntegrityViolationException dataIntegrityViolationException) {
+                LOG.info("Insert violated record.", dataIntegrityViolationException);
+                //continue;
+            }
         }
     }
 

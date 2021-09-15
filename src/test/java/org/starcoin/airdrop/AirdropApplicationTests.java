@@ -5,8 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.starcoin.airdrop.data.model.AirdropProject;
 import org.starcoin.airdrop.data.model.AirdropRecord;
+import org.starcoin.airdrop.data.model.StarcoinVoteChangedEvent;
+import org.starcoin.airdrop.data.model.VoteReward;
 import org.starcoin.airdrop.data.repo.AirdropProjectRepository;
 import org.starcoin.airdrop.data.repo.AirdropRecordRepository;
+import org.starcoin.airdrop.data.repo.StarcoinEventRepository;
+import org.starcoin.airdrop.data.repo.VoteRewardRepository;
 import org.starcoin.airdrop.service.ElasticSearchService;
 import org.starcoin.airdrop.service.StarcoinVoteChangedEventService;
 
@@ -27,8 +31,19 @@ class AirdropApplicationTests {
     @Autowired
     StarcoinVoteChangedEventService starcoinVoteChangedEventService;
 
+    @Autowired
+    StarcoinEventRepository starcoinEventRepository;
+
+    @Autowired
+    VoteRewardRepository voteRewardRepository;
+
     @Test
     void contextLoads() {
+//        List<StarcoinVoteChangedEvent> events = starcoinEventRepository.findStarcoinVoteChangedEventsByProposalIdOrderByVoteTimestamp(0L);
+//        System.out.println(events);
+        VoteReward voteReward = voteRewardRepository.findFirstByProposalIdAndVoterOrderByVoteTimestampDesc(0L, "");
+        System.out.println(voteReward);
+        if (true) return;
         List<AirdropProject> airdropProjects = airdropProjectRepository.findAll();
         System.out.println(airdropProjects.size());
 
