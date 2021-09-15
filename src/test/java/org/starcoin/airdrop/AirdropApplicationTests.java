@@ -43,6 +43,9 @@ class AirdropApplicationTests {
 //        System.out.println(events);
         VoteReward voteReward = voteRewardRepository.findFirstByProposalIdAndVoterOrderByVoteTimestampDesc(0L, "");
         System.out.println(voteReward);
+        List<VoteReward> voteRewards = voteRewardRepository.findByProposalIdAndVoterOrderByVoteTimestamp(0L, "");
+        System.out.println(voteRewards);
+
         if (true) return;
         List<AirdropProject> airdropProjects = airdropProjectRepository.findAll();
         System.out.println(airdropProjects.size());
