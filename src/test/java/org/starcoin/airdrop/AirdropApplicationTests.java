@@ -15,7 +15,14 @@ import org.starcoin.airdrop.service.ElasticSearchService;
 import org.starcoin.airdrop.service.StarcoinVoteChangedEventService;
 import org.starcoin.airdrop.service.VoteRewardService;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @SpringBootTest
 class AirdropApplicationTests {
@@ -43,6 +50,19 @@ class AirdropApplicationTests {
 
     @Test
     void contextLoads() {
+        List<Map<String, Object>> sumRewards = voteRewardRepository.sumRewardAmountGroupByVoter(0L);
+        for (Map<String, Object> m : sumRewards) {
+            System.out.println(m.get("voter") + "\t" + m.get("reward_amount"));
+        }
+        if (true) return;
+        ZonedDateTime voteEndTime = ZonedDateTime.of(2021, 6, 16, 0, 0, 0, 0, ZoneId.of("Asia/Shanghai"));
+        voteRewardService.calculateRewords(0L, voteEndTime.toInstant().toEpochMilli());
+        if (true) return;
+        ZonedDateTime now = ZonedDateTime.now();
+        ZonedDateTime tomorrow = now.plusYears(1);
+        BigInteger reward = VoteRewardService.getRewordAmount(BigInteger.valueOf(1000000000), now.toInstant().toEpochMilli(), tomorrow.toInstant().toEpochMilli());
+        System.out.println(reward);
+        if (true) return;
         long proposalId = 0L;
         List<StarcoinVoteChangedEvent> events = starcoinEventRepository.findStarcoinVoteChangedEventsByProposalIdOrderByVoteTimestamp(proposalId);
         voteRewardService.addOrUpdateVoteRewards(proposalId, events);

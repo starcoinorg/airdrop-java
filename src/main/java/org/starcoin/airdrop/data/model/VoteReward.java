@@ -52,6 +52,12 @@ public class VoteReward {
     @Column(name = "updated_at", nullable = false)
     private Long updatedAt;
 
+    /**
+     * 是否已不再使用。
+     */
+    @Column(nullable = false)
+    private Boolean deactived = false;
+
     @Version
     private Long version;
 
@@ -157,5 +163,13 @@ public class VoteReward {
 
     public void setRewardVoteAmount(BigInteger rewardVoteAmount) {
         this.rewardVoteAmount = rewardVoteAmount;
+    }
+
+    public Boolean getDeactived() {
+        return deactived;
+    }
+
+    public void setDeactived(Boolean deactived) {
+        this.deactived = deactived;
     }
 }

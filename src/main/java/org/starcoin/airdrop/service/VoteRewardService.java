@@ -8,7 +8,9 @@ import org.starcoin.airdrop.data.model.StarcoinVoteChangedEvent;
 import org.starcoin.airdrop.data.model.VoteReward;
 import org.starcoin.airdrop.data.repo.VoteRewardRepository;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,13 +19,36 @@ import java.util.Map;
 public class VoteRewardService {
     private static final Logger LOG = LoggerFactory.getLogger(VoteRewardService.class);
 
+    private static final BigDecimal REWARD_APY = new BigDecimal("0.15");
+
+    private static final long YEAR_SECONDS = 60L * 60 * 24 * 365;
+
     @Autowired
     private VoteRewardRepository voteRewardRepository;
 
-    public void addOrUpdateVoteRewards(Long proposalId, List<StarcoinVoteChangedEvent> voteChangedEvents) {
+    public static BigInteger getRewordAmount(BigInteger voteAmount, long voteTimestamp, long voteEndTimestamp) {
+        return new BigDecimal(voteAmount)
+                .multiply(REWARD_APY)
+                .multiply(BigDecimal.valueOf((voteEndTimestamp - voteTimestamp) / 1000)
+                        .divide(BigDecimal.valueOf(YEAR_SECONDS), 10, RoundingMode.HALF_UP))
+                .toBigInteger();
+    }
+
+    public void calculateRewords(long proposalId, long voteEndTimestamp) {
+        List<VoteReward> voteRewards = voteRewardRepository.findByProposalIdAndDeactivedIsFalse(proposalId);
+        for (VoteReward v : voteRewards) {
+            BigInteger rewardAmount = getRewordAmount(v.getRewardVoteAmount(), v.getVoteTimestamp(), voteEndTimestamp);
+            v.setRewardAmount(rewardAmount.compareTo(BigInteger.ZERO) > 0 ? rewardAmount : BigInteger.ZERO);
+            v.setUpdatedAt(System.currentTimeMillis());
+            v.setUpdatedBy("admin");
+            voteRewardRepository.save(v);
+        }
+    }
+
+    public void addOrUpdateVoteRewards(long proposalId, List<StarcoinVoteChangedEvent> voteChangedEvents) {
         Map<String, BigInteger> voterLastUpdateAmountMap = new HashMap<>();
         for (StarcoinVoteChangedEvent e : voteChangedEvents) {
-            if (!proposalId.equals(e.getProposalId())) {
+            if (proposalId != e.getProposalId()) {
                 throw new IllegalArgumentException("ProposalId NOT equals e.getProposalId()");
             }
             VoteReward v = voteRewardRepository.findById(e.getEventId()).orElse(null);
