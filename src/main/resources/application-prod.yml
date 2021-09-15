@@ -16,7 +16,7 @@ spring:
     outOfOrder: false # 生产环境关闭 outOfOrder
 
 elasticsearch:
-  transaction-event-index-prefix: "main"
+  transaction-event-index-prefix: "main.0727"
 
 logging:
   level:
