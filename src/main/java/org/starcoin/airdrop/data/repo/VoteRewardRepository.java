@@ -22,6 +22,7 @@ public interface VoteRewardRepository extends JpaRepository<VoteReward, String> 
             "    v.voter, SUM(v.reward_amount) AS reward_amount\n" +
             "FROM\n" +
             "    vote_reward v WHERE proposal_id = :proposalId\n" +
-            "GROUP BY v.voter;", nativeQuery = true)
+            "GROUP BY v.voter HAVING reward_amount > 0;", nativeQuery = true)
     List<Map<String, Object>> sumRewardAmountGroupByVoter(Long proposalId);
+
 }
