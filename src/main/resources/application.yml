@@ -49,6 +49,10 @@ elasticsearch:
   connectionRequestTimeout: 2000
   transaction-event-index-prefix: "main"
 
+airdrop:
+  vote-reward-process-task-service:
+    fixed-delay: 10000
+
 logging:
   level:
     org:

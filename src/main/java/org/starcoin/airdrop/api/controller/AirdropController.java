@@ -5,7 +5,6 @@ import io.swagger.annotations.Api;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 import org.starcoin.airdrop.data.model.VoteRewardProcess;
-import org.starcoin.airdrop.data.repo.VoteRewardRepository;
 import org.starcoin.airdrop.service.VoteRewardProcessService;
 import org.starcoin.airdrop.service.VoteRewardService;
 
@@ -26,9 +25,6 @@ public class AirdropController {
     private VoteRewardService voteRewardService;
 
     @Resource
-    private VoteRewardRepository voteRewardRepository;//todo remove this
-
-    @Resource
     private VoteRewardProcessService voteRewardProcessService;
 
     @GetMapping("voteRewardProcesses/{processId}")
@@ -43,8 +39,15 @@ public class AirdropController {
 
     @GetMapping("exportRewardCsv")
     public void exportRewardCsv(HttpServletResponse response,
-                                @RequestParam("proposalId") Long proposalId
+                                @RequestParam("processId") Long processId
     ) throws IOException {
+        VoteRewardProcess voteRewardProcess = voteRewardProcessService.findByIdOrElseThrow(processId);
+        if (voteRewardProcess.isProcessing()) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+        Long proposalId = voteRewardProcess.getProposalId();
+
         // set file name and content type
         String filename = "rewards.csv";
         response.setContentType("text/csv");
@@ -61,7 +64,7 @@ public class AirdropController {
 //                .withEscapeChar(CSVWriter.DEFAULT_ESCAPE_CHARACTER)
 //                .withLineEnd(CSVWriter.DEFAULT_LINE_END)
 //                .build();
-        List<Map<String, Object>> rewards = voteRewardRepository.sumRewardAmountGroupByVoter(proposalId);
+        List<Map<String, Object>> rewards = voteRewardService.sumRewardAmountGroupByVoter(proposalId);
         rewards.stream().map(m -> {
             List<String> cells = new ArrayList<>();
             for (String h : headerRecord) {

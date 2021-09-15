@@ -29,4 +29,8 @@ public class VoteRewardProcessService {
         voteRewardProcessRepository.flush();
         return v;
     }
+
+    public VoteRewardProcess findByIdOrElseThrow(Long processId) {
+        return voteRewardProcessRepository.findById(processId).orElseThrow(() -> new RuntimeException("Cannot find process by Id: " + processId));
+    }
 }

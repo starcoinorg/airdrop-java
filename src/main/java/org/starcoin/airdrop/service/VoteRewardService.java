@@ -51,6 +51,7 @@ public class VoteRewardService {
             if (proposalId != e.getProposalId()) {
                 throw new IllegalArgumentException("ProposalId NOT equals e.getProposalId()");
             }
+            // todo ignore deactived events...
             VoteReward v = voteRewardRepository.findById(e.getEventId()).orElse(null);
             if (v == null) {
                 v = new VoteReward();
@@ -67,6 +68,7 @@ public class VoteRewardService {
                 v.setUpdatedAt(System.currentTimeMillis());
                 v.setUpdatedBy("admin");
             }
+            v.setDeactived(false);
             v.setVoteAmount(e.getVoteAmount());
             v.setVoteAddedAmount(getVoteAddedAmount(voterLastUpdateAmountMap, e.getVoter(), e.getVoteAmount()));
             v.setRewardVoteAmount(v.getVoteAddedAmount()); // default rewardVoteAmount is voteAddedAmount
@@ -104,4 +106,7 @@ public class VoteRewardService {
         }
     }
 
+    public List<Map<String, Object>> sumRewardAmountGroupByVoter(Long proposalId) {
+        return voteRewardRepository.sumRewardAmountGroupByVoter(proposalId);
+    }
 }

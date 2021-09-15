@@ -26,12 +26,8 @@ public class StarcoinVoteChangedEventService {
         List<ElasticSearchService.TransactionVoteChangedEvent> esEvents;
         try {
             esEvents = elasticSearchService.findTransactionEventsByProposalIdAndProposer(proposalId, proposer, fromTimestamp, toTimestamp);
-        } catch (IOException exception) {
-            LOG.error("Find ES events error.", exception);
-            return;
-        } catch (DeserializationError deserializationError) {
-            LOG.error("Find ES events error.", deserializationError);
-            return;
+        } catch (IOException | DeserializationError exception) {
+            throw new RuntimeException("Find ES events error.", exception);
         }
         for (ElasticSearchService.TransactionVoteChangedEvent es : esEvents) {
             StarcoinVoteChangedEvent trg = new StarcoinVoteChangedEvent();
@@ -41,6 +37,15 @@ public class StarcoinVoteChangedEventService {
             trg.setCreatedBy("admin");
             trg.setUpdatedAt(trg.getCreatedAt());
             trg.setUpdatedBy(trg.getCreatedBy());
+            StarcoinVoteChangedEvent existedEvent = (StarcoinVoteChangedEvent) starcoinEventRepository.findById(trg.getEventId()).orElse(null);
+            if (existedEvent != null) {
+                ElasticSearchService.copyProperties(es, existedEvent);
+                existedEvent.setUpdatedBy("admin");
+                existedEvent.setUpdatedAt(System.currentTimeMillis());
+                existedEvent.resetStatus();
+                starcoinEventRepository.save(existedEvent);
+                continue;
+            }
             try {
                 starcoinEventRepository.save(trg);
             } catch (org.springframework.dao.DataIntegrityViolationException dataIntegrityViolationException) {

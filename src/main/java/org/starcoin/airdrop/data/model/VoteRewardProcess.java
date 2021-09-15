@@ -12,8 +12,11 @@ public class VoteRewardProcess {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long processId;
 
-    @Column(name = "proposal_id")
+    @Column(name = "proposal_id", nullable = false)
     private Long proposalId;
+
+    @Column(length = 34, nullable = false)
+    private String proposer;
 
     @Column
     private Long voteStartTimestamp;
@@ -117,5 +120,26 @@ public class VoteRewardProcess {
 
     public void setVersion(Long version) {
         this.version = version;
+    }
+
+    public String getProposer() {
+        return proposer;
+    }
+
+    public void setProposer(String proposer) {
+        this.proposer = proposer;
+    }
+
+    public void processing() {
+        this.setStatus(STATUS_PROCESSING);
+    }
+
+    public void processed() {
+        this.setStatus(STATUS_PROCESSED);
+    }
+
+    public boolean isProcessing() {
+        return STATUS_PROCESSING.equalsIgnoreCase(this.getStatus())
+                || STATUS_CREATED.equalsIgnoreCase(this.getStatus());
     }
 }

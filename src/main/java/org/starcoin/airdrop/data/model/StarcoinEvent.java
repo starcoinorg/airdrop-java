@@ -173,6 +173,10 @@ public abstract class StarcoinEvent {
         this.setStatus(STATUS_CONFIRMED);
     }
 
+    public void resetStatus() {
+        this.setStatus(STATUS_CREATED);
+    }
+
     public String getCreatedBy() {
         return createdBy;
     }
