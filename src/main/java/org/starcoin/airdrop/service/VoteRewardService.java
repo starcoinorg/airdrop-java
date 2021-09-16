@@ -51,7 +51,10 @@ public class VoteRewardService {
             if (proposalId != e.getProposalId()) {
                 throw new IllegalArgumentException("ProposalId NOT equals e.getProposalId()");
             }
-            // todo ignore deactived events...
+            // ignore deactived events
+            if (e.isDeactived()) {
+                continue;
+            }
             VoteReward v = voteRewardRepository.findById(e.getEventId()).orElse(null);
             if (v == null) {
                 v = new VoteReward();

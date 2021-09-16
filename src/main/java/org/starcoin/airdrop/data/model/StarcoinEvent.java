@@ -30,6 +30,8 @@ public abstract class StarcoinEvent {
 
     public static final String STATUS_DROPPED = "DROPPED";
 
+    public static final String STATUS_DEACTIVED = "DEACTIVED";
+
     @Id
     @Column(length = 66, nullable = false)
     private String eventId;
@@ -207,6 +209,10 @@ public abstract class StarcoinEvent {
 
     public void setUpdatedAt(Long updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public boolean isDeactived() {
+        return STATUS_DEACTIVED.equalsIgnoreCase(this.getStatus());
     }
 
     @Override

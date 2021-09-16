@@ -7,6 +7,7 @@ import org.starcoin.airdrop.data.model.StarcoinVoteChangedEvent;
 import org.starcoin.airdrop.data.model.VoteRewardProcess;
 import org.starcoin.airdrop.data.repo.StarcoinEventRepository;
 import org.starcoin.airdrop.data.repo.VoteRewardProcessRepository;
+import org.starcoin.airdrop.data.repo.VoteRewardRepository;
 import org.starcoin.airdrop.service.StarcoinVoteChangedEventService;
 import org.starcoin.airdrop.service.VoteRewardService;
 
@@ -27,6 +28,9 @@ public class VoteRewardProcessTaskService {
     @Autowired
     private StarcoinEventRepository starcoinEventRepository;
 
+    @Autowired
+    private VoteRewardRepository voteRewardRepository;
+
     @Scheduled(fixedDelayString = "${airdrop.vote-reward-process-task-service.fixed-delay}")
     public void task() {
         List<VoteRewardProcess> voteRewardProcesses = voteRewardProcessRepository.findByStatusEquals(VoteRewardProcess.STATUS_CREATED);
@@ -34,10 +38,10 @@ public class VoteRewardProcessTaskService {
             updateStatusProcessing(v);
             // ------------------------------
             // start processing...
-            //todo deactive event statuses by proposal Id.
+            starcoinEventRepository.deactiveEventsByProposalId(v.getProposalId());
             starcoinVoteChangedEventService.findESEventsAndSave(v.getProposalId(), v.getProposer(), v.getVoteStartTimestamp(), v.getVoteEndTimestamp());
             List<StarcoinVoteChangedEvent> events = starcoinEventRepository.findStarcoinVoteChangedEventsByProposalIdOrderByVoteTimestamp(v.getProposalId());
-            //todo deactive vote reward records by proposal Id.
+            voteRewardRepository.deactiveVoteRewardsByProposalId(v.getProposalId());
             voteRewardService.addOrUpdateVoteRewards(v.getProposalId(), events);
             voteRewardService.calculateRewords(v.getProposalId(), v.getVoteEndTimestamp());
             // ------------------------------

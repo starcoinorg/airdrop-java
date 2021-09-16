@@ -1,9 +1,12 @@
 package org.starcoin.airdrop.data.repo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.starcoin.airdrop.data.model.VoteReward;
 
+import javax.transaction.Transactional;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
@@ -25,4 +28,12 @@ public interface VoteRewardRepository extends JpaRepository<VoteReward, String> 
             "GROUP BY v.voter HAVING reward_amount > 0;", nativeQuery = true)
     List<Map<String, Object>> sumRewardAmountGroupByVoter(Long proposalId);
 
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE vote_reward \n" +
+            "SET \n" +
+            "    deactived = TRUE\n" +
+            "WHERE\n" +
+            "    proposal_id = :proposalId", nativeQuery = true)
+    void deactiveVoteRewardsByProposalId(@Param("proposalId") Long proposalId);
 }
