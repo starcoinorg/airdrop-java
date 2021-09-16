@@ -1,5 +1,7 @@
 package org.starcoin.airdrop.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,10 +11,14 @@ import org.starcoin.airdrop.data.repo.StarcoinEventRepository;
 import org.starcoin.airdrop.data.repo.VoteRewardProcessRepository;
 import org.starcoin.airdrop.data.repo.VoteRewardRepository;
 
+import java.math.BigInteger;
 import java.util.List;
 
 @Service
 public class VoteRewardProcessService {
+    private static final Logger LOG = LoggerFactory.getLogger(VoteRewardProcessService.class);
+
+    private static final BigInteger TOTAL_REWARD_AMOUNT_LIMIT = BigInteger.valueOf(20000L).multiply(BigInteger.TEN.pow(9));
 
     @Autowired
     private VoteRewardProcessRepository voteRewardProcessRepository;
@@ -63,6 +69,11 @@ public class VoteRewardProcessService {
         voteRewardRepository.deactiveVoteRewardsByProposalId(v.getProposalId());
         voteRewardService.addOrUpdateVoteRewards(v.getProposalId(), events);
         voteRewardService.calculateRewords(v.getProposalId(), v.getVoteEndTimestamp());
+        BigInteger totalRewardAmount = voteRewardRepository.sumTotalRewardAmountByProposalId(v.getProposalId());
+        if (totalRewardAmount.compareTo(TOTAL_REWARD_AMOUNT_LIMIT) > 0) {
+            LOG.info("Calculated total reward amount exceed limit. " + totalRewardAmount + " > " + TOTAL_REWARD_AMOUNT_LIMIT);
+            //todo adjust amount.
+        }
         // ------------------------------
         updateVoteRewardProcessStatusProcessed(v.getProcessId());
     }
