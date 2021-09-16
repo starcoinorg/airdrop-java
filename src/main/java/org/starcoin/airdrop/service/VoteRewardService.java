@@ -8,6 +8,7 @@ import org.starcoin.airdrop.data.model.StarcoinVoteChangedEvent;
 import org.starcoin.airdrop.data.model.VoteReward;
 import org.starcoin.airdrop.data.repo.VoteRewardRepository;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -37,7 +38,7 @@ public class VoteRewardService {
     public void calculateRewords(long proposalId, long voteEndTimestamp) {
         List<VoteReward> voteRewards = voteRewardRepository.findByProposalIdAndDeactivedIsFalse(proposalId);
         for (VoteReward v : voteRewards) {
-            if (v.getDeactived()) { // ignore deactived(deleted) records.
+            if (v.getDeactived()) {
                 continue;
             }
             BigInteger rewardAmount = getRewordAmount(v.getRewardVoteAmount(), v.getVoteTimestamp(), voteEndTimestamp);
@@ -114,5 +115,20 @@ public class VoteRewardService {
 
     public List<Map<String, Object>> sumRewardAmountGroupByVoter(Long proposalId) {
         return voteRewardRepository.sumRewardAmountGroupByVoter(proposalId);
+    }
+
+    @Transactional
+    public void adjustRewardsUnderLimit(Long proposalId, BigInteger currentTotalRewardAmount, BigInteger totalRewardAmountLimit) {
+        List<VoteReward> voteRewards = voteRewardRepository.findByProposalIdAndDeactivedIsFalse(proposalId);
+        for (VoteReward v : voteRewards) {
+            if (v.getDeactived()) {
+                continue;
+            }
+            BigInteger rewardAmount = v.getRewardAmount().multiply(totalRewardAmountLimit).divide(currentTotalRewardAmount);
+            v.setRewardAmount(rewardAmount);
+            v.setUpdatedAt(System.currentTimeMillis());
+            v.setUpdatedBy("admin");
+            voteRewardRepository.save(v);
+        }
     }
 }

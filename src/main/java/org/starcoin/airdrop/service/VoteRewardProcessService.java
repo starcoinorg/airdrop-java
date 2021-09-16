@@ -72,7 +72,8 @@ public class VoteRewardProcessService {
         BigInteger totalRewardAmount = voteRewardRepository.sumTotalRewardAmountByProposalId(v.getProposalId());
         if (totalRewardAmount.compareTo(TOTAL_REWARD_AMOUNT_LIMIT) > 0) {
             LOG.info("Calculated total reward amount exceed limit. " + totalRewardAmount + " > " + TOTAL_REWARD_AMOUNT_LIMIT);
-            //todo adjust amount.
+            voteRewardService.adjustRewardsUnderLimit(v.getProposalId(), totalRewardAmount, TOTAL_REWARD_AMOUNT_LIMIT);
+            LOG.info("Adjusted rewards under total amount limit: " + TOTAL_REWARD_AMOUNT_LIMIT);
         }
         // ------------------------------
         updateVoteRewardProcessStatusProcessed(v.getProcessId());
