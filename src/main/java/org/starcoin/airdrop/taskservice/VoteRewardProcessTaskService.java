@@ -1,5 +1,7 @@
 package org.starcoin.airdrop.taskservice;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -9,60 +11,35 @@ import org.starcoin.airdrop.data.repo.StarcoinEventRepository;
 import org.starcoin.airdrop.data.repo.VoteRewardProcessRepository;
 import org.starcoin.airdrop.data.repo.VoteRewardRepository;
 import org.starcoin.airdrop.service.StarcoinVoteChangedEventService;
+import org.starcoin.airdrop.service.VoteRewardProcessService;
 import org.starcoin.airdrop.service.VoteRewardService;
 
 import java.util.List;
 
 @Service
 public class VoteRewardProcessTaskService {
+    private static final Logger LOG = LoggerFactory.getLogger(VoteRewardProcessTaskService.class);
 
     @Autowired
     private VoteRewardProcessRepository voteRewardProcessRepository;
 
     @Autowired
-    private StarcoinVoteChangedEventService starcoinVoteChangedEventService;
-
-    @Autowired
-    private VoteRewardService voteRewardService;
-
-    @Autowired
-    private StarcoinEventRepository starcoinEventRepository;
-
-    @Autowired
-    private VoteRewardRepository voteRewardRepository;
+    private VoteRewardProcessService voteRewardProcessService;
 
     @Scheduled(fixedDelayString = "${airdrop.vote-reward-process-task-service.fixed-delay}")
     public void task() {
         List<VoteRewardProcess> voteRewardProcesses = voteRewardProcessRepository.findByStatusEquals(VoteRewardProcess.STATUS_CREATED);
         for (VoteRewardProcess v : voteRewardProcesses) {
-            updateStatusProcessing(v);
-            // ------------------------------
             // start processing...
-            starcoinEventRepository.deactiveEventsByProposalId(v.getProposalId());
-            starcoinVoteChangedEventService.findESEventsAndSave(v.getProposalId(), v.getProposer(), v.getVoteStartTimestamp(), v.getVoteEndTimestamp());
-            List<StarcoinVoteChangedEvent> events = starcoinEventRepository.findStarcoinVoteChangedEventsByProposalIdOrderByVoteTimestamp(v.getProposalId());
-            voteRewardRepository.deactiveVoteRewardsByProposalId(v.getProposalId());
-            voteRewardService.addOrUpdateVoteRewards(v.getProposalId(), events);
-            voteRewardService.calculateRewords(v.getProposalId(), v.getVoteEndTimestamp());
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Start processing vote rewards... ProcessId: " + v.getProcessId());
+            }
+            voteRewardProcessService.process(v);
             // ------------------------------
-            updateVoteRewardProcessStatusProcessed(v.getProcessId());
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("End of processing vote rewards. ProcessId: " + v.getProcessId());
+            }
         }
     }
 
-    private void updateVoteRewardProcessStatusProcessed(Long processId) {
-        VoteRewardProcess v = voteRewardProcessRepository.findById(processId).orElseThrow(() -> new RuntimeException("Cannot find by process by Id: " + processId));
-        v.processed();
-        v.setUpdatedBy("admin");
-        v.setUpdatedAt(System.currentTimeMillis());
-        voteRewardProcessRepository.save(v);
-        voteRewardProcessRepository.flush();
-    }
-
-    private void updateStatusProcessing(VoteRewardProcess v) {
-        v.processing();
-        v.setUpdatedBy("admin");
-        v.setUpdatedAt(System.currentTimeMillis());
-        voteRewardProcessRepository.save(v);
-        voteRewardProcessRepository.flush();
-    }
 }

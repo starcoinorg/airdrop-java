@@ -3,14 +3,31 @@ package org.starcoin.airdrop.service;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.starcoin.airdrop.data.model.StarcoinVoteChangedEvent;
 import org.starcoin.airdrop.data.model.VoteRewardProcess;
+import org.starcoin.airdrop.data.repo.StarcoinEventRepository;
 import org.starcoin.airdrop.data.repo.VoteRewardProcessRepository;
+import org.starcoin.airdrop.data.repo.VoteRewardRepository;
+
+import java.util.List;
 
 @Service
 public class VoteRewardProcessService {
 
     @Autowired
     private VoteRewardProcessRepository voteRewardProcessRepository;
+
+    @Autowired
+    private StarcoinVoteChangedEventService starcoinVoteChangedEventService;
+
+    @Autowired
+    private VoteRewardService voteRewardService;
+
+    @Autowired
+    private StarcoinEventRepository starcoinEventRepository;
+
+    @Autowired
+    private VoteRewardRepository voteRewardRepository;
 
     public VoteRewardProcess getVoteRewardProcess(Long processId) {
         return voteRewardProcessRepository.findById(processId).orElse(null);
@@ -33,4 +50,38 @@ public class VoteRewardProcessService {
     public VoteRewardProcess findByIdOrElseThrow(Long processId) {
         return voteRewardProcessRepository.findById(processId).orElseThrow(() -> new RuntimeException("Cannot find process by Id: " + processId));
     }
+
+    public void process(VoteRewardProcess v) {
+        if (!VoteRewardProcess.STATUS_CREATED.equalsIgnoreCase(v.getStatus())) {
+            throw new IllegalArgumentException("VoteRewardProcess status error. ProcessId: " + v.getProcessId());
+        }
+        updateStatusProcessing(v);
+        // ------------------------------
+        starcoinEventRepository.deactiveEventsByProposalId(v.getProposalId());
+        starcoinVoteChangedEventService.findESEventsAndSave(v.getProposalId(), v.getProposer(), v.getVoteStartTimestamp(), v.getVoteEndTimestamp());
+        List<StarcoinVoteChangedEvent> events = starcoinEventRepository.findStarcoinVoteChangedEventsByProposalIdOrderByVoteTimestamp(v.getProposalId());
+        voteRewardRepository.deactiveVoteRewardsByProposalId(v.getProposalId());
+        voteRewardService.addOrUpdateVoteRewards(v.getProposalId(), events);
+        voteRewardService.calculateRewords(v.getProposalId(), v.getVoteEndTimestamp());
+        // ------------------------------
+        updateVoteRewardProcessStatusProcessed(v.getProcessId());
+    }
+
+    private void updateVoteRewardProcessStatusProcessed(Long processId) {
+        VoteRewardProcess v = voteRewardProcessRepository.findById(processId).orElseThrow(() -> new RuntimeException("Cannot find by process by Id: " + processId));
+        v.processed();
+        v.setUpdatedBy("admin");
+        v.setUpdatedAt(System.currentTimeMillis());
+        voteRewardProcessRepository.save(v);
+        voteRewardProcessRepository.flush();
+    }
+
+    private void updateStatusProcessing(VoteRewardProcess v) {
+        v.processing();
+        v.setUpdatedBy("admin");
+        v.setUpdatedAt(System.currentTimeMillis());
+        voteRewardProcessRepository.save(v);
+        voteRewardProcessRepository.flush();
+    }
+
 }

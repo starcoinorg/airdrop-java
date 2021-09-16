@@ -32,8 +32,8 @@ public interface VoteRewardRepository extends JpaRepository<VoteReward, String> 
     @Transactional
     @Query(value = "UPDATE vote_reward \n" +
             "SET \n" +
-            "    deactived = TRUE\n" +
-            "WHERE\n" +
+            "    deactived = TRUE, reward_amount = 0 \n" +
+            "WHERE \n" +
             "    proposal_id = :proposalId", nativeQuery = true)
     void deactiveVoteRewardsByProposalId(@Param("proposalId") Long proposalId);
 }

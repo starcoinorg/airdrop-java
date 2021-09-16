@@ -37,6 +37,9 @@ public class VoteRewardService {
     public void calculateRewords(long proposalId, long voteEndTimestamp) {
         List<VoteReward> voteRewards = voteRewardRepository.findByProposalIdAndDeactivedIsFalse(proposalId);
         for (VoteReward v : voteRewards) {
+            if (v.getDeactived()) { // ignore deactived(deleted) records.
+                continue;
+            }
             BigInteger rewardAmount = getRewordAmount(v.getRewardVoteAmount(), v.getVoteTimestamp(), voteEndTimestamp);
             v.setRewardAmount(rewardAmount.compareTo(BigInteger.ZERO) > 0 ? rewardAmount : BigInteger.ZERO);
             v.setUpdatedAt(System.currentTimeMillis());
@@ -71,7 +74,7 @@ public class VoteRewardService {
                 v.setUpdatedAt(System.currentTimeMillis());
                 v.setUpdatedBy("admin");
             }
-            v.setDeactived(false);
+            v.setDeactived(false); // active it!
             v.setVoteAmount(e.getVoteAmount());
             v.setVoteAddedAmount(getVoteAddedAmount(voterLastUpdateAmountMap, e.getVoter(), e.getVoteAmount()));
             v.setRewardVoteAmount(v.getVoteAddedAmount()); // default rewardVoteAmount is voteAddedAmount
