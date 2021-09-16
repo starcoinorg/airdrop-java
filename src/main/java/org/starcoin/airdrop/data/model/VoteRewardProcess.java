@@ -3,6 +3,7 @@ package org.starcoin.airdrop.data.model;
 import javax.persistence.*;
 
 @Entity
+@Table(uniqueConstraints = {@UniqueConstraint(name = "UniqueName", columnNames = {"name"})})
 public class VoteRewardProcess {
     public static final int CHAIN_ID_MAIN = 1;//1: 'main'
     public static final int CHAIN_ID_PROXIMA = 2;//2: 'proxima'
@@ -43,6 +44,9 @@ public class VoteRewardProcess {
 
     @Column(name = "updated_at", nullable = false)
     private Long updatedAt;
+
+    @Column(length = 100)
+    private String name;
 
     @Column(length = 255)
     private String description;
@@ -192,5 +196,13 @@ public class VoteRewardProcess {
 
     public void setChainId(Integer chainId) {
         this.chainId = chainId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

@@ -2,12 +2,17 @@ package org.starcoin.airdrop.service;
 
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.starcoin.airdrop.data.model.VoteRewardProcess;
 import org.starcoin.airdrop.data.repo.VoteRewardProcessRepository;
 import org.starcoin.airdrop.data.repo.VoteRewardRepository;
+import org.starcoin.airdrop.utils.StarcoinAccountAddressUtils;
+import org.starcoin.types.Ed25519PrivateKey;
+import org.starcoin.utils.SignatureUtils;
 import studio.wormhole.quark.command.alma.airdrop.ApiMerkleTree;
 import studio.wormhole.quark.command.alma.airdrop.CSVRecord;
 import studio.wormhole.quark.command.alma.airdrop.MerkleTreeHelper;
@@ -20,6 +25,11 @@ import java.util.stream.Collectors;
 
 @Service
 public class MerkleTreeService {
+    private static final Logger LOG = LoggerFactory.getLogger(MerkleTreeService.class);
+
+    private final String airdropOwnerPrivateKey;
+
+    private final String airdropOwnerAddress;
 
     @Autowired
     private VoteRewardRepository voteRewardRepository;
@@ -36,7 +46,13 @@ public class MerkleTreeService {
     @Value("${starcoin.airdrop.token-type}")
     private String airdropTokenType;
 
-    private String privateKeyStr;//todo config
+    public MerkleTreeService(@Value("${starcoin.airdrop.owner-private-key}") String airdropOwnerPrivateKey) {
+        this.airdropOwnerPrivateKey = airdropOwnerPrivateKey;
+        Ed25519PrivateKey privateKey = SignatureUtils.strToPrivateKey(this.airdropOwnerPrivateKey);
+        //Ed25519PublicKey publicKey = SignatureUtils.getPublicKey(privateKey);
+        this.airdropOwnerAddress = StarcoinAccountAddressUtils.getAddressFromPrivateKey(privateKey);
+        LOG.info("Airdrop owner address: " + this.airdropOwnerAddress);
+    }
 
     public void createAirdropMerkleTreeAndUpdateOnChain(Long processId, Long airdropId) {
         ApiMerkleTree apiMerkleTree = createAirdropMerkleTree(processId, airdropId);
@@ -67,7 +83,7 @@ public class MerkleTreeService {
         if (airdropId == null) {
             throw new IllegalArgumentException("Airdrop Id is null.");
         }
-        //List<CSVRecord> records = Lists.newArrayList(csvToBean.iterator());
+        // List<CSVRecord> records = Lists.newArrayList(csvToBean.iterator());
         List<Map<String, Object>> rs = voteRewardRepository.sumRewardAmountGroupByVoter(proposalId);
         List<CSVRecord> records = rs.stream().map(r -> {
             CSVRecord csvRecord = new CSVRecord();
@@ -87,19 +103,14 @@ public class MerkleTreeService {
             throw new RuntimeException("Token type is null.");
         }
         apiMerkleTree.setTokenType(airdropTokenType);
-        //todo setOwnerAddress
-        //apiMerkleTree.setOwnerAddress(AccountAddressUtils.hex(chainService.accountAddress()));
+        apiMerkleTree.setOwnerAddress(airdropOwnerAddress);
 
         apiMerkleTree.setChainId(chainId);
         String json = JSON.toJSONString(apiMerkleTree, true);
         //System.out.println(json);
-        // write json
         process.setAirdropJson(json);
         voteRewardProcessRepository.save(process);
         voteRewardProcessRepository.flush();
-        //        if (StringUtils.isNotEmpty(out)) {
-        //            FileUtils.writeStringToFile(new File(out), JSON.toJSONString(apiMerkleTree, true), Charset.defaultCharset());
-        //        }
         return apiMerkleTree;
     }
 

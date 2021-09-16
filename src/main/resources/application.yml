@@ -58,3 +58,5 @@ starcoin:
   airdrop:
     token-type: "0x00000000000000000000000000000001::STC::STC"
     function-address: "0xb987F1aB0D7879b2aB421b98f96eFb44"
+    owner-private-key: ${STARCOIN_AIRDROP_OWNER_PK}
+

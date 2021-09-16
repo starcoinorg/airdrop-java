@@ -16,6 +16,10 @@ public class AirdropProjectService {
 
     @Transactional
     public Long addProject(String name, Date startTime, Date endTime) {
+        AirdropProject existedPrj = airdropProjectRepository.findFirstByName(name);
+        if (existedPrj != null) {
+            throw new RuntimeException("Project name existed.");
+        }
         // INSERT INTO `airdrop.airdrop_projects`
         // (id, name, token, token_symbol, token_precision, start_at, end_at)
         // VALUES

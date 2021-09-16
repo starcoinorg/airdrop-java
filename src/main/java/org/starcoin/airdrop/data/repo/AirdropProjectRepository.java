@@ -9,4 +9,6 @@ public interface AirdropProjectRepository extends JpaRepository<AirdropProject, 
 
     List<AirdropProject> findByName(String name);
 
+    AirdropProject findFirstByName(String name);
+
 }
