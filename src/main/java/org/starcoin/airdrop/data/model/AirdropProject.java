@@ -15,13 +15,16 @@ public class AirdropProject {
     private Long id; // int NOT NULL AUTO_INCREMENT,
 
     @Column
-    private final String token = "0x1::STC::STC"; // varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '0x1::STC::STC',
+    private String token = "0x1::STC::STC"; // varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '0x1::STC::STC',
 
+    /**
+     * Chain Id. localhost=254, main=1, barnard=251
+     */
     @Column(name = "network_version")
-    private final Integer networkVersion = 0; // int DEFAULT '0',
+    private Integer networkVersion = 0; // int DEFAULT '0',
 
     @Column(name = "token_precision")
-    private final Integer tokenPrecision = 9;// int DEFAULT '9',
+    private Integer tokenPrecision = 9;// int DEFAULT '9',
 
     @Column(nullable = false)
     private String name; // varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '',
@@ -68,8 +71,16 @@ public class AirdropProject {
         return token;
     }
 
+    public void setToken(String token) {
+        this.token = token;
+    }
+
     public Integer getNetworkVersion() {
         return networkVersion;
+    }
+
+    public void setNetworkVersion(Integer networkVersion) {
+        this.networkVersion = networkVersion;
     }
 
     public String getName() {
@@ -98,6 +109,10 @@ public class AirdropProject {
 
     public Integer getTokenPrecision() {
         return tokenPrecision;
+    }
+
+    public void setTokenPrecision(Integer tokenPrecision) {
+        this.tokenPrecision = tokenPrecision;
     }
 
     public BigInteger getTotalAmount() {

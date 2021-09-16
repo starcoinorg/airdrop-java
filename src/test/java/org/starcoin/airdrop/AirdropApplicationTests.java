@@ -11,6 +11,7 @@ import org.starcoin.airdrop.data.repo.AirdropProjectRepository;
 import org.starcoin.airdrop.data.repo.AirdropRecordRepository;
 import org.starcoin.airdrop.data.repo.StarcoinEventRepository;
 import org.starcoin.airdrop.data.repo.VoteRewardRepository;
+import org.starcoin.airdrop.service.AirdropProjectService;
 import org.starcoin.airdrop.service.ElasticSearchService;
 import org.starcoin.airdrop.service.StarcoinVoteChangedEventService;
 import org.starcoin.airdrop.service.VoteRewardService;
@@ -48,21 +49,31 @@ class AirdropApplicationTests {
     @Autowired
     VoteRewardService voteRewardService;
 
+    @Autowired
+    AirdropProjectService airdropProjectService;
+
     @Test
     void contextLoads() {
+        Long prjId = airdropProjectService.addProject("Test prj. " + System.currentTimeMillis(), new Date(), new Date());
+        System.out.println(prjId);
+        if (true) return;
+
         List<Map<String, Object>> sumRewards = voteRewardRepository.sumRewardAmountGroupByVoter(0L);
         for (Map<String, Object> m : sumRewards) {
             System.out.println(m.get("voter") + "\t" + m.get("reward_amount"));
         }
         if (true) return;
+
         ZonedDateTime voteEndTime = ZonedDateTime.of(2021, 6, 16, 0, 0, 0, 0, ZoneId.of("Asia/Shanghai"));
         voteRewardService.calculateRewords(0L, voteEndTime.toInstant().toEpochMilli());
         if (true) return;
+
         ZonedDateTime now = ZonedDateTime.now();
         ZonedDateTime tomorrow = now.plusYears(1);
         BigInteger reward = VoteRewardService.getRewordAmount(BigInteger.valueOf(1000000000), now.toInstant().toEpochMilli(), tomorrow.toInstant().toEpochMilli());
         System.out.println(reward);
         if (true) return;
+
         long proposalId = 0L;
         List<StarcoinVoteChangedEvent> events = starcoinEventRepository.findStarcoinVoteChangedEventsByProposalIdOrderByVoteTimestamp(proposalId);
         voteRewardService.addOrUpdateVoteRewards(proposalId, events);
@@ -71,8 +82,8 @@ class AirdropApplicationTests {
 //        System.out.println(voteReward);
 //        List<VoteReward> voteRewards = voteRewardRepository.findByProposalIdAndVoterOrderByVoteTimestamp(0L, "");
 //        System.out.println(voteRewards);
-
         if (true) return;
+
         List<AirdropProject> airdropProjects = airdropProjectRepository.findAll();
         System.out.println(airdropProjects.size());
 

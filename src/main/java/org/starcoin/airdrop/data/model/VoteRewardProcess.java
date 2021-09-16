@@ -39,8 +39,16 @@ public class VoteRewardProcess {
     @Column(name = "updated_at", nullable = false)
     private Long updatedAt;
 
-    @Column
+    @Column(length = 255)
     private String description;
+
+    @Column(length = 255)
+    private String message;
+
+    @Lob
+    @Column(columnDefinition = "text")
+    @Basic(fetch = FetchType.LAZY)
+    private String airdropJson;
 
     @Version
     private Long version;
@@ -152,5 +160,21 @@ public class VoteRewardProcess {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getAirdropJson() {
+        return airdropJson;
+    }
+
+    public void setAirdropJson(String airdropJson) {
+        this.airdropJson = airdropJson;
     }
 }
