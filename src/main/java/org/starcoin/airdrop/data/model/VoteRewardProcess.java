@@ -4,6 +4,11 @@ import javax.persistence.*;
 
 @Entity
 public class VoteRewardProcess {
+    public static final int CHAIN_ID_MAIN = 1;//1: 'main'
+    public static final int CHAIN_ID_PROXIMA = 2;//2: 'proxima'
+    public static final int CHAIN_ID_BARNARD = 251;//251: 'barnard'
+    public static final int CHAIN_ID_HALLEY = 251;//253: 'halley'
+
     public static final String STATUS_CREATED = "CREATED";
     public static final String STATUS_PROCESSING = "PROCESSING";
     public static final String STATUS_PROCESSED = "PROCESSED";
@@ -44,6 +49,9 @@ public class VoteRewardProcess {
 
     @Column(length = 255)
     private String message;
+
+    @Column
+    private Integer chainId;
 
     @Lob
     @Column(columnDefinition = "text")
@@ -176,5 +184,13 @@ public class VoteRewardProcess {
 
     public void setAirdropJson(String airdropJson) {
         this.airdropJson = airdropJson;
+    }
+
+    public Integer getChainId() {
+        return chainId;
+    }
+
+    public void setChainId(Integer chainId) {
+        this.chainId = chainId;
     }
 }
