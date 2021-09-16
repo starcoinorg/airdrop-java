@@ -53,3 +53,8 @@ airdrop:
   vote-reward-process-task-service:
     fixed-delay: 10000
 
+starcoin:
+  chain-id: 1
+  airdrop:
+    token-type: "0x00000000000000000000000000000001::STC::STC"
+    function-address: "0xb987F1aB0D7879b2aB421b98f96eFb44"

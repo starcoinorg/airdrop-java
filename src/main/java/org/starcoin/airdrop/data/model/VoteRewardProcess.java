@@ -54,7 +54,7 @@ public class VoteRewardProcess {
     private Integer chainId;
 
     @Lob
-    @Column(columnDefinition = "text")
+    @Column(columnDefinition = "LongText")
     @Basic(fetch = FetchType.LAZY)
     private String airdropJson;
 

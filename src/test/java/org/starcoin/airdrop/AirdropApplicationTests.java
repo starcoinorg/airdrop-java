@@ -11,10 +11,7 @@ import org.starcoin.airdrop.data.repo.AirdropProjectRepository;
 import org.starcoin.airdrop.data.repo.AirdropRecordRepository;
 import org.starcoin.airdrop.data.repo.StarcoinEventRepository;
 import org.starcoin.airdrop.data.repo.VoteRewardRepository;
-import org.starcoin.airdrop.service.AirdropProjectService;
-import org.starcoin.airdrop.service.ElasticSearchService;
-import org.starcoin.airdrop.service.StarcoinVoteChangedEventService;
-import org.starcoin.airdrop.service.VoteRewardService;
+import org.starcoin.airdrop.service.*;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -52,8 +49,14 @@ class AirdropApplicationTests {
     @Autowired
     AirdropProjectService airdropProjectService;
 
+    @Autowired
+    MerkleTreeService merkleTreeService;
+
     @Test
     void contextLoads() {
+        merkleTreeService.createAirdropMerkleTreeAndUpdateOnChain(8L, 0L);
+        if (true) return;
+
         Long prjId = airdropProjectService.addProject("Test prj. " + System.currentTimeMillis(), new Date(), new Date());
         System.out.println(prjId);
         if (true) return;
