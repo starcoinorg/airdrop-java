@@ -11,7 +11,9 @@ import org.starcoin.airdrop.data.model.VoteRewardProcess;
 import org.starcoin.airdrop.data.repo.VoteRewardProcessRepository;
 import org.starcoin.airdrop.data.repo.VoteRewardRepository;
 import org.starcoin.airdrop.utils.StarcoinAccountAddressUtils;
+import org.starcoin.airdrop.utils.StarcoinTransactionPayloadUtils;
 import org.starcoin.types.Ed25519PrivateKey;
+import org.starcoin.types.TransactionPayload;
 import org.starcoin.utils.SignatureUtils;
 import studio.wormhole.quark.command.alma.airdrop.ApiMerkleTree;
 import studio.wormhole.quark.command.alma.airdrop.CSVRecord;
@@ -58,11 +60,20 @@ public class MerkleTreeService {
         ApiMerkleTree apiMerkleTree = createAirdropMerkleTree(processId, airdropId);
         BigInteger amount = apiMerkleTree.getProofs().stream().map(s -> s.getAmount())
                 .reduce((bigInteger, bigInteger2) -> bigInteger.add(bigInteger2)).get();
-        //todo update on-chain.
         //        chainService.call_function(apiMerkleTree.getFunctionAddress() + "::MerkleDistributorScript::create",
         //                Lists.newArrayList(apiMerkleTree.getTokenType()),
-        //                Lists.newArrayList(apiMerkleTree.getAirDropId() + "", apiMerkleTree.getRoot(), amount.toString(), apiMerkleTree.getProofs().size() + "")
+        //                Lists.newArrayList(apiMerkleTree.getAirDropId() + "", apiMerkleTree.getRoot(),
+        //                amount.toString(), apiMerkleTree.getProofs().size() + "")
         //        );
+        TransactionPayload transactionPayload = StarcoinTransactionPayloadUtils.encodeMerkleDistributorScriptCreateFunction(
+                apiMerkleTree.getTokenType(),
+                apiMerkleTree.getAirDropId(),
+                apiMerkleTree.getRoot(),
+                amount,
+                apiMerkleTree.getProofs().size()
+        );
+
+        //todo update on-chain.
 
     }
 

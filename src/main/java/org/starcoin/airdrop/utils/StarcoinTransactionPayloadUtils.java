@@ -16,14 +16,26 @@ public class StarcoinTransactionPayloadUtils {
      * curl --location --request POST 'https://barnard-seed.starcoin.org' \
      * --header 'Content-Type: application/json' \
      * --data-raw '{
-     *  "id":101,
-     *  "jsonrpc":"2.0",
-     *  "method":"contract.resolve_function",
-     *  "params":["0xb987F1aB0D7879b2aB421b98f96eFb44::MerkleDistributorScript::create"]
+     * "id":101,
+     * "jsonrpc":"2.0",
+     * "method":"contract.resolve_function",
+     * "params":["0xb987F1aB0D7879b2aB421b98f96eFb44::MerkleDistributorScript::create"]
      * }'
-     * 
      */
-    // todo encodeMerkleDistributorScriptCreateFunction...
+    public static TransactionPayload encodeMerkleDistributorScriptCreateFunction(String tokenType,
+                                                                                 Long airdropId,
+                                                                                 String root,
+                                                                                 BigInteger amount,
+                                                                                 Integer proofsSize) {
+        // todo encodeMerkleDistributorScriptCreateFunction...
+        //        chainService.call_function(apiMerkleTree.getFunctionAddress() + "::MerkleDistributorScript::create",
+        //                Lists.newArrayList(apiMerkleTree.getTokenType()),
+        //                Lists.newArrayList(apiMerkleTree.getAirDropId() + "", apiMerkleTree.getRoot(), amount.toString(), apiMerkleTree.getProofs().size() + "")
+        //        );
+        return null;
+    }
+
+
     // MerkleDistributorScript::create
     public static TransactionPayload encode_withdraw_from_ethereum_chain_script_function(TypeTag token_type,
                                                                                          String from,
