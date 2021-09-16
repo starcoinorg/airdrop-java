@@ -1,0 +1,30 @@
+spring:
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: update
+
+  flyway:
+    enabled: false # 启用或禁用 flyway
+
+logging:
+  level:
+    org:
+      springframework:
+        web:
+          filter:
+            CommonsRequestLoggingFilter: DEBUG
+
+      # 输出数据库模型（开发阶段）
+      hibernate:
+        tool:
+          hbm2ddl: DEBUG
+
+      starcoin:
+        airdrop:
+          api: DEBUG
+          service: DEBUG
+          data: DEBUG
+

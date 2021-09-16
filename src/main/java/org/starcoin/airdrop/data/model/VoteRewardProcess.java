@@ -39,6 +39,9 @@ public class VoteRewardProcess {
     @Column(name = "updated_at", nullable = false)
     private Long updatedAt;
 
+    @Column
+    private String description;
+
     @Version
     private Long version;
 
@@ -141,5 +144,13 @@ public class VoteRewardProcess {
     public boolean isProcessing() {
         return STATUS_PROCESSING.equalsIgnoreCase(this.getStatus())
                 || STATUS_CREATED.equalsIgnoreCase(this.getStatus());
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
