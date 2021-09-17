@@ -40,11 +40,11 @@
 			<version>30.1.1-jre</version>
 		</dependency>
 
-		<dependency>
-			<groupId>com.thetransactioncompany</groupId>
-			<artifactId>jsonrpc2-client</artifactId>
-			<version>1.16.5</version>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>com.thetransactioncompany</groupId>-->
+<!--			<artifactId>jsonrpc2-client</artifactId>-->
+<!--			<version>1.16.5</version>-->
+<!--		</dependency>-->
 
 		<dependency>
 			<groupId>io.springfox</groupId>

@@ -47,16 +47,18 @@ elasticsearch:
   connTimeout: 10000
   socketTimeout: 10000
   connectionRequestTimeout: 2000
-  transaction-event-index-prefix: "main"
+  transaction-event-index-prefix: ${STARCOIN_ES_TXN_EVENT_IDX_PREFIX}
 
 airdrop:
   vote-reward-process-task-service:
     fixed-delay: 10000
 
 starcoin:
-  chain-id: 1
+  # seeds: ${STARCOIN_SEEDS}
+  network: ${STARCOIN_NETWORK}
+  json-rpc-url: ${STARCOIN_JSON_RPC_URL}
+  chain-id: ${STARCOIN_CHAIN_ID}
   airdrop:
     token-type: "0x00000000000000000000000000000001::STC::STC"
     function-address: "0xb987F1aB0D7879b2aB421b98f96eFb44"
     owner-private-key: ${STARCOIN_AIRDROP_OWNER_PK}
-

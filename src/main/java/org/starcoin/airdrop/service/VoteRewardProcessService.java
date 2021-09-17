@@ -12,6 +12,7 @@ import org.starcoin.airdrop.data.repo.VoteRewardProcessRepository;
 import org.starcoin.airdrop.data.repo.VoteRewardRepository;
 
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -34,6 +35,12 @@ public class VoteRewardProcessService {
 
     @Autowired
     private VoteRewardRepository voteRewardRepository;
+
+    @Autowired
+    private AirdropProjectService airdropProjectService;
+
+    @Autowired
+    private MerkleTreeService merkleTreeService;
 
     public VoteRewardProcess getVoteRewardProcess(Long processId) {
         return voteRewardProcessRepository.findById(processId).orElse(null);
@@ -75,6 +82,8 @@ public class VoteRewardProcessService {
             voteRewardService.adjustRewardsUnderLimit(v.getProposalId(), totalRewardAmount, TOTAL_REWARD_AMOUNT_LIMIT);
             LOG.info("Adjusted rewards under total amount limit: " + TOTAL_REWARD_AMOUNT_LIMIT);
         }
+        Long projId = airdropProjectService.addProject(v.getName(), new Date(v.getVoteStartTimestamp()), new Date(v.getVoteEndTimestamp()));
+        merkleTreeService.createAirdropMerkleTreeAndUpdateOnChain(v.getProcessId(), projId);
         // ------------------------------
         updateVoteRewardProcessStatusProcessed(v.getProcessId());
     }

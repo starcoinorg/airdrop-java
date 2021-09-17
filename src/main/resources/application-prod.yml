@@ -15,8 +15,8 @@ spring:
     locations: classpath:db/migration # 设定 SQL 脚本的目录，比如取值为 classpath:db/migration,filesystem:/sql-migrations
     outOfOrder: false # 生产环境关闭 outOfOrder
 
-elasticsearch:
-  transaction-event-index-prefix: "main.0727"
+#elasticsearch:
+#  transaction-event-index-prefix: "main.0727"
 
 logging:
   level:

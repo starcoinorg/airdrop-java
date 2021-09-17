@@ -6,9 +6,9 @@ import com.novi.serde.Int128;
 import com.novi.serde.SerializationError;
 import com.novi.serde.Unsigned;
 import org.starcoin.types.*;
-import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;
+import java.util.Collections;
 
 public class StarcoinTransactionPayloadUtils {
 
@@ -22,43 +22,59 @@ public class StarcoinTransactionPayloadUtils {
      * "params":["0xb987F1aB0D7879b2aB421b98f96eFb44::MerkleDistributorScript::create"]
      * }'
      */
-    public static TransactionPayload encodeMerkleDistributorScriptCreateFunction(String tokenType,
+    public static TransactionPayload encodeMerkleDistributorScriptCreateFunction(String functionAddress,
+                                                                                 String tokenType,
                                                                                  Long airdropId,
                                                                                  String root,
                                                                                  BigInteger amount,
-                                                                                 Integer proofsSize) {
-        // todo encodeMerkleDistributorScriptCreateFunction...
+                                                                                 Long proofsSize) {
         //        chainService.call_function(apiMerkleTree.getFunctionAddress() + "::MerkleDistributorScript::create",
         //                Lists.newArrayList(apiMerkleTree.getTokenType()),
-        //                Lists.newArrayList(apiMerkleTree.getAirDropId() + "", apiMerkleTree.getRoot(), amount.toString(), apiMerkleTree.getProofs().size() + "")
+        //                Lists.newArrayList(apiMerkleTree.getAirDropId() + "", apiMerkleTree.getRoot(),
+        //                amount.toString(), apiMerkleTree.getProofs().size() + "")
         //        );
-        return null;
-    }
-
-
-    // MerkleDistributorScript::create
-    public static TransactionPayload encode_withdraw_from_ethereum_chain_script_function(TypeTag token_type,
-                                                                                         String from,
-                                                                                         AccountAddress to,
-                                                                                         BigInteger amount,
-                                                                                         int from_chain) {
         ScriptFunction.Builder script_function_builder = new ScriptFunction.Builder();
-        script_function_builder.ty_args = java.util.Arrays.asList(token_type);
-        //(signer: signer, from: vector<u8>, to: address, amount: u128, from_chain: u8)
+        script_function_builder.ty_args = Collections.singletonList(TypeUtils.parseTypeTag(tokenType));
         script_function_builder.args = java.util.Arrays.asList(
-                encode_u8vector_argument(new Bytes(Numeric.hexStringToByteArray(from))),
-                encode_address_argument(to),
+                encode_u64_argument(airdropId),
+                encode_u8vector_argument(new Bytes(CommonUtils.hexToByteArray(root))),
                 encode_u128_argument(amount),
-                encode_u8_argument((byte) from_chain));
-        script_function_builder.function = new Identifier("withdraw_from_ethereum_chain");
+                encode_u64_argument(proofsSize)
+        );
+        script_function_builder.function = new Identifier("create");
         script_function_builder.module = new ModuleId(
-                AccountAddress.valueOf(Numeric.hexStringToByteArray("0x569AB535990a17Ac9Afd1bc57Faec683")),
-                new Identifier("BifrostScripts"));
+                AccountAddress.valueOf(CommonUtils.hexToByteArray(functionAddress)),
+                new Identifier("MerkleDistributorScript"));
 
         TransactionPayload.ScriptFunction.Builder builder = new TransactionPayload.ScriptFunction.Builder();
         builder.value = script_function_builder.build();
         return builder.build();
     }
+
+
+//    // MerkleDistributorScript::create
+//    public static TransactionPayload encode_withdraw_from_ethereum_chain_script_function(TypeTag token_type,
+//                                                                                         String from,
+//                                                                                         AccountAddress to,
+//                                                                                         BigInteger amount,
+//                                                                                         int from_chain) {
+//        ScriptFunction.Builder script_function_builder = new ScriptFunction.Builder();
+//        script_function_builder.ty_args = Collections.singletonList(token_type);
+//        //(signer: signer, from: vector<u8>, to: address, amount: u128, from_chain: u8)
+//        script_function_builder.args = java.util.Arrays.asList(
+//                encode_u8vector_argument(new Bytes(Numeric.hexStringToByteArray(from))),
+//                encode_address_argument(to),
+//                encode_u128_argument(amount),
+//                encode_u8_argument((byte) from_chain));
+//        script_function_builder.function = new Identifier("withdraw_from_ethereum_chain");
+//        script_function_builder.module = new ModuleId(
+//                AccountAddress.valueOf(Numeric.hexStringToByteArray("0x569AB535990a17Ac9Afd1bc57Faec683")),
+//                new Identifier("BifrostScripts"));
+//
+//        TransactionPayload.ScriptFunction.Builder builder = new TransactionPayload.ScriptFunction.Builder();
+//        builder.value = script_function_builder.build();
+//        return builder.build();
+//    }
 
 
     private static Bytes encode_u8_argument(@Unsigned Byte arg) {
@@ -70,6 +86,19 @@ public class StarcoinTransactionPayloadUtils {
 
         } catch (SerializationError e) {
             throw new IllegalArgumentException("Unable to serialize argument of type u8");
+        }
+    }
+
+
+    private static Bytes encode_u64_argument(@Unsigned Long arg) {
+        try {
+
+            BcsSerializer s = new BcsSerializer();
+            s.serialize_u64(arg);
+            return Bytes.valueOf(s.get_bytes());
+
+        } catch (SerializationError e) {
+            throw new IllegalArgumentException("Unable to serialize argument of type u64");
         }
     }
 

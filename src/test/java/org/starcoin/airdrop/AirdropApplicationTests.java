@@ -6,16 +6,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.starcoin.airdrop.data.model.AirdropProject;
 import org.starcoin.airdrop.data.model.AirdropRecord;
 import org.starcoin.airdrop.data.model.StarcoinVoteChangedEvent;
-import org.starcoin.airdrop.data.model.VoteReward;
 import org.starcoin.airdrop.data.repo.AirdropProjectRepository;
 import org.starcoin.airdrop.data.repo.AirdropRecordRepository;
 import org.starcoin.airdrop.data.repo.StarcoinEventRepository;
 import org.starcoin.airdrop.data.repo.VoteRewardRepository;
 import org.starcoin.airdrop.service.*;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
@@ -51,6 +48,37 @@ class AirdropApplicationTests {
 
     @Autowired
     MerkleTreeService merkleTreeService;
+
+    //
+    // A test proposal in barnard network:
+    // proposalId = 29
+    // proposer = 0x0000000000000000000000000a550c18
+    //
+    // To distribute vote rewards, called this function:
+    // 0xb987f1ab0d7879b2ab421b98f96efb44::MerkleDistributorScript::create
+    // Submitted transaction:
+    // https://stcscan.io/barnard/transactions/detail/0x56b16b40e22929112be338a2bda160f29ee0c48dd7e3992090da7d585ced8866
+    //
+    // Created airdrop(reward) json file:
+    //{
+    //    "airDropId": 11,
+    //    "chainId": 251,
+    //    "functionAddress": "0xb987F1aB0D7879b2aB421b98f96eFb44",
+    //    "ownerAddress": "0xccf1adedf0ba6f9bdb9a6905173a5d72",
+    //    "proofs": [
+    //        {
+    //            "address": "0x0000000000000000000000000a550c18",
+    //            "amount": 19999999999999,
+    //            "index": 0,
+    //            "proof": [
+    //                "0xf9b34a781533306d40793cad67a30e4791c655bbbf3ed76eabfe998f4d2f38f7"
+    //            ]
+    //        }
+    //    ],
+    //    "root": "0x98d2a629ed623aba9c219c946ef063845d878fe0a265701bdce4d104d857d522",
+    //    "tokenType": "0x00000000000000000000000000000001::STC::STC"
+    //}
+    //
 
     @Test
     void contextLoads() {

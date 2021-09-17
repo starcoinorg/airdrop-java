@@ -8,7 +8,7 @@ public class VoteRewardProcess {
     public static final int CHAIN_ID_MAIN = 1;//1: 'main'
     public static final int CHAIN_ID_PROXIMA = 2;//2: 'proxima'
     public static final int CHAIN_ID_BARNARD = 251;//251: 'barnard'
-    public static final int CHAIN_ID_HALLEY = 251;//253: 'halley'
+    public static final int CHAIN_ID_HALLEY = 253;//253: 'halley'
 
     public static final String STATUS_CREATED = "CREATED";
     public static final String STATUS_PROCESSING = "PROCESSING";
@@ -61,6 +61,8 @@ public class VoteRewardProcess {
     @Column(columnDefinition = "LongText")
     @Basic(fetch = FetchType.LAZY)
     private String airdropJson;
+
+    // todo add on-chain hash field???
 
     @Version
     private Long version;
