@@ -10,6 +10,7 @@ import org.starcoin.airdrop.data.model.VoteRewardProcess;
 import org.starcoin.airdrop.data.repo.StarcoinEventRepository;
 import org.starcoin.airdrop.data.repo.VoteRewardProcessRepository;
 import org.starcoin.airdrop.data.repo.VoteRewardRepository;
+import studio.wormhole.quark.command.alma.airdrop.ApiMerkleTree;
 
 import java.math.BigInteger;
 import java.util.Date;
@@ -19,6 +20,7 @@ import java.util.List;
 public class VoteRewardProcessService {
     private static final Logger LOG = LoggerFactory.getLogger(VoteRewardProcessService.class);
 
+    //todo config???
     private static final BigInteger TOTAL_REWARD_AMOUNT_LIMIT = BigInteger.valueOf(20000L).multiply(BigInteger.TEN.pow(9));
 
     @Autowired
@@ -82,8 +84,9 @@ public class VoteRewardProcessService {
             voteRewardService.adjustRewardsUnderLimit(v.getProposalId(), totalRewardAmount, TOTAL_REWARD_AMOUNT_LIMIT);
             LOG.info("Adjusted rewards under total amount limit: " + TOTAL_REWARD_AMOUNT_LIMIT);
         }
-        Long projId = airdropProjectService.addProject(v.getName(), new Date(v.getVoteStartTimestamp()), new Date(v.getVoteEndTimestamp()));
-        merkleTreeService.createAirdropMerkleTreeAndUpdateOnChain(v.getProcessId(), projId);
+        Long projId = airdropProjectService.addProject(v.getChainId(), v.getName(), new Date(v.getVoteStartTimestamp()), new Date(v.getVoteEndTimestamp()));
+        ApiMerkleTree apiMerkleTree = merkleTreeService.createAirdropMerkleTreeAndUpdateOnChain(v.getProcessId(), projId);
+        airdropProjectService.updateProject(projId, apiMerkleTree.getOwnerAddress(), apiMerkleTree.getRoot());
         // ------------------------------
         updateVoteRewardProcessStatusProcessed(v.getProcessId());
     }

@@ -14,8 +14,17 @@ public class AirdropProjectService {
     @Autowired
     private AirdropProjectRepository airdropProjectRepository;
 
+    /**
+     * Add airdrop project.
+     *
+     * @param chainId   chain Id.
+     * @param name      prject name(process name).
+     * @param startTime vote started at.
+     * @param endTime   vote ended at.
+     * @return Project Id.
+     */
     @Transactional
-    public Long addProject(String name, Date startTime, Date endTime) {
+    public Long addProject(Integer chainId, String name, Date startTime, Date endTime) {
         AirdropProject existedPrj = airdropProjectRepository.findFirstByName(name);
         if (existedPrj != null) {
             throw new RuntimeException("Project name existed.");
@@ -28,14 +37,24 @@ public class AirdropProjectService {
         p.setName(name);
         p.setStartAt(startTime);
         p.setEndAt(endTime);
+        p.setNetworkVersion(chainId);
         //p.setToken("0x1::STC::STC");
+        p.setCreateAt(new Date());
+        p.setUpdateAt(p.getCreateAt());
         airdropProjectRepository.save(p);
         airdropProjectRepository.flush();
         return p.getId();
     }
 
+    /**
+     * Update project info.
+     *
+     * @param id           project Id.
+     * @param ownerAddress On-chain owner address.
+     * @param root         merkle tree root.
+     */
     @Transactional
-    public void updateProject(Long id, String ownerAddress, String root, Integer chainId) {
+    public void updateProject(Long id, String ownerAddress, String root) { // , Integer chainId
         AirdropProject p = airdropProjectRepository.findById(id).orElseThrow(() -> new RuntimeException("Cannot find project by Id: " + id));
         // `update airdrop_projects set
         // owner_address='${reward.ownerAddress}',
@@ -44,7 +63,7 @@ public class AirdropProjectService {
         // where id = ${reward.airDropId};`
         p.setOwnerAddress(ownerAddress);
         p.setRoot(root);
-        p.setNetworkVersion(chainId);
+        //p.setNetworkVersion(chainId);
         p.setUpdateAt(new Date());
         airdropProjectRepository.save(p);
         airdropProjectRepository.flush();

@@ -71,7 +71,7 @@ public class MerkleTreeService {
         return jsonRpcUrl;
     }
 
-    public void createAirdropMerkleTreeAndUpdateOnChain(Long processId, Long airdropId) {
+    public ApiMerkleTree createAirdropMerkleTreeAndUpdateOnChain(Long processId, Long airdropId) {
         ApiMerkleTree apiMerkleTree = createAirdropMerkleTree(processId, airdropId);
         BigInteger amount = apiMerkleTree.getProofs().stream().map(ApiMerkleProof::getAmount)
                 .reduce(BigInteger::add).orElseThrow(() -> new RuntimeException("Null amount."));
@@ -107,6 +107,7 @@ public class MerkleTreeService {
         }
         String transactionHash = submitHexTransaction(this.jsonRpcSession, signedMessage);
         LOG.info("Submit MerkleDistributorScript-create transaction on-chain. Transaction hash: " + transactionHash);
+        return apiMerkleTree;
     }
 
     private ApiMerkleTree createAirdropMerkleTree(Long processId, Long airdropId) {
