@@ -28,6 +28,14 @@ public class StarcoinOnChainUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(StarcoinOnChainUtils.class);
 
+    public static BigInteger getLatestBlockNumber(JSONRPC2Session jsonRpcSession) throws JSONRPC2SessionException, JsonProcessingException {
+        String method = "chain.info";
+        Map<String, Object> resultMap = new JsonRpcClient(jsonRpcSession).sendJsonRpc(
+                method, Collections.emptyList(), new TypeReference<Map<String, Object>>() {
+                });
+        return new BigInteger(((Map<String, Object>) resultMap.get("head")).get("number").toString());
+    }
+
     public static String submitHexTransaction(JSONRPC2Session jsonRpcSession, byte[] signedMessage) {
         String hexValue = Numeric.toHexString(signedMessage);
         if (LOG.isDebugEnabled())
