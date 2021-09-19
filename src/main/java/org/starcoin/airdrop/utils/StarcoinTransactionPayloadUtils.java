@@ -1,6 +1,5 @@
 package org.starcoin.airdrop.utils;
 
-import com.google.common.collect.Lists;
 import com.novi.bcs.BcsSerializer;
 import com.novi.serde.Bytes;
 import com.novi.serde.Int128;

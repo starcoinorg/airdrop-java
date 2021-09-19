@@ -1,6 +1,5 @@
 package org.starcoin.airdrop.utils;
 
-import org.bouncycastle.jcajce.provider.digest.Keccak;
 import org.bouncycastle.jcajce.provider.digest.SHA3;
 import org.bouncycastle.util.encoders.Hex;
 import org.starcoin.airdrop.data.model.StarcoinEvent;

@@ -21,7 +21,7 @@ public class AirdropProjectService {
      * @param name      project name(process name).
      * @param startTime vote started at.
      * @param endTime   vote ended at.
-     * @return Airdrop Id.(Project Id.)
+     * @return Airdrop Id.(project Id.)
      */
     @Transactional
     public Long addProject(Integer chainId, String name, Date startTime, Date endTime) {
@@ -38,7 +38,7 @@ public class AirdropProjectService {
         p.setStartAt(startTime);
         p.setEndAt(endTime);
         p.setNetworkVersion(chainId);
-        //p.setToken("0x1::STC::STC");
+        //p.setToken("0x1::STC::STC"); // default token type.
         p.setCreateAt(new Date());
         p.setUpdateAt(p.getCreateAt());
         airdropProjectRepository.save(p);
@@ -49,20 +49,20 @@ public class AirdropProjectService {
     /**
      * Update project info.
      *
-     * @param id           project Id.
+     * @param airdropId    Airdrop Id.(project Id.)
      * @param ownerAddress On-chain owner address.
-     * @param root         merkle tree root.
+     * @param rootHash     merkle tree root hash.
      */
     @Transactional
-    public void updateProject(Long id, String ownerAddress, String root) { // , Integer chainId
-        AirdropProject p = airdropProjectRepository.findById(id).orElseThrow(() -> new RuntimeException("Cannot find project by Id: " + id));
+    public void updateProject(Long airdropId, String ownerAddress, String rootHash) { // , Integer chainId
+        AirdropProject p = airdropProjectRepository.findById(airdropId).orElseThrow(() -> new RuntimeException("Cannot find project by Id: " + airdropId));
         // `update airdrop_projects set
         // owner_address='${reward.ownerAddress}',
         // root='${reward.root}',
         // network_version='${reward.chainId}'
         // where id = ${reward.airDropId};`
         p.setOwnerAddress(ownerAddress);
-        p.setRoot(root);
+        p.setRoot(rootHash);
         //p.setNetworkVersion(chainId);
         p.setUpdateAt(new Date());
         airdropProjectRepository.save(p);

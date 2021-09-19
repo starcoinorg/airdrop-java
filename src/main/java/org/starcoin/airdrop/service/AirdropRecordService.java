@@ -10,7 +10,6 @@ import studio.wormhole.quark.command.alma.airdrop.ApiMerkleTree;
 import javax.transaction.Transactional;
 import java.math.BigInteger;
 import java.util.Date;
-import java.util.Locale;
 
 @Service
 public class AirdropRecordService {

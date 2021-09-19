@@ -74,6 +74,9 @@ public class VoteRewardProcess {
     @Column
     private Boolean onChainDisabled;
 
+    @Version
+    private Long version;
+
     public Boolean getOnChainDisabled() {
         return onChainDisabled;
     }
@@ -81,9 +84,6 @@ public class VoteRewardProcess {
     public void setOnChainDisabled(Boolean onChainDisabled) {
         this.onChainDisabled = onChainDisabled;
     }
-
-    @Version
-    private Long version;
 
     public Long getProcessId() {
         return processId;

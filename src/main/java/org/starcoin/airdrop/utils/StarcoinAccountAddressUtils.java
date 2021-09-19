@@ -10,9 +10,9 @@ import java.util.Arrays;
 import java.util.Collections;
 
 public class StarcoinAccountAddressUtils {
-    private static final int ACCOUNT_ADDRESS_LENGTH = 16;
     public static final byte SCHEME_ID_ED25519 = 0;
     public static final byte SCHEME_ID_MULTIED25519 = 1;
+    private static final int ACCOUNT_ADDRESS_LENGTH = 16;
 
     public static String trimAddress(String address) {
         String a = address.startsWith("0x") ? address.substring(2) : address;

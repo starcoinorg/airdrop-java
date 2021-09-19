@@ -84,17 +84,10 @@ public class VoteRewardProcessService {
         }
         List<StarcoinVoteChangedEvent> events = starcoinEventRepository.findStarcoinVoteChangedEventsByProposalIdOrderByVoteTimestamp(v.getProposalId());
         voteRewardRepository.deactiveVoteRewardsByProposalId(v.getProposalId());
-        voteRewardService.addOrUpdateVoteRewards(v.getProposalId(), events);
-        voteRewardService.calculateRewords(v.getProposalId(), v.getVoteEndTimestamp());
-        BigInteger totalRewardAmount = voteRewardRepository.sumTotalRewardAmountByProposalId(v.getProposalId());
-        if (totalRewardAmount.compareTo(TOTAL_REWARD_AMOUNT_LIMIT) > 0) {
-            LOG.info("Calculated total reward amount exceed limit. " + totalRewardAmount + " > " + TOTAL_REWARD_AMOUNT_LIMIT);
-            voteRewardService.adjustRewardsUnderLimit(v.getProposalId(), totalRewardAmount, TOTAL_REWARD_AMOUNT_LIMIT);
-            LOG.info("Adjusted rewards under total amount limit: " + TOTAL_REWARD_AMOUNT_LIMIT);
-        }
+        processVoteRewards(v, events);
         Long airdropId = airdropProjectService.addProject(v.getChainId(), v.getName(), new Date(v.getVoteStartTimestamp()), new Date(v.getVoteEndTimestamp()));
         ApiMerkleTree apiMerkleTree;
-        boolean onChain = v.getOnChainDisabled() == null || !v.getOnChainDisabled();
+        boolean onChain = v.getOnChainDisabled() == null || !v.getOnChainDisabled(); // default is on-chain.
         if (onChain) {
             apiMerkleTree = airdropMerkleDistributionService.createAirdropMerkleTreeAndUpdateOnChain(v.getProcessId(), airdropId);
         } else {
@@ -104,6 +97,17 @@ public class VoteRewardProcessService {
         airdropRecordService.addAirdropRecords(apiMerkleTree);
         // ------------------------------
         updateVoteRewardProcessStatusProcessed(v.getProcessId());
+    }
+
+    private void processVoteRewards(VoteRewardProcess v, List<StarcoinVoteChangedEvent> events) {
+        voteRewardService.addOrUpdateVoteRewards(v.getProposalId(), events);
+        voteRewardService.calculateRewords(v.getProposalId(), v.getVoteEndTimestamp());
+        BigInteger totalRewardAmount = voteRewardRepository.sumTotalRewardAmountByProposalId(v.getProposalId());
+        if (totalRewardAmount.compareTo(TOTAL_REWARD_AMOUNT_LIMIT) > 0) {
+            LOG.info("Calculated total reward amount exceed limit. " + totalRewardAmount + " > " + TOTAL_REWARD_AMOUNT_LIMIT);
+            voteRewardService.adjustRewardsUnderLimit(v.getProposalId(), totalRewardAmount, TOTAL_REWARD_AMOUNT_LIMIT);
+            LOG.info("Adjusted rewards under total amount limit: " + TOTAL_REWARD_AMOUNT_LIMIT);
+        }
     }
 
     private void updateVoteRewardProcessingMessage(Long processId, String message) {

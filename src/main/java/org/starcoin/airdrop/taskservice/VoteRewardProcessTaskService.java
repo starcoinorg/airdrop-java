@@ -5,14 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.starcoin.airdrop.data.model.StarcoinVoteChangedEvent;
 import org.starcoin.airdrop.data.model.VoteRewardProcess;
-import org.starcoin.airdrop.data.repo.StarcoinEventRepository;
 import org.starcoin.airdrop.data.repo.VoteRewardProcessRepository;
-import org.starcoin.airdrop.data.repo.VoteRewardRepository;
-import org.starcoin.airdrop.service.StarcoinVoteChangedEventService;
 import org.starcoin.airdrop.service.VoteRewardProcessService;
-import org.starcoin.airdrop.service.VoteRewardService;
 
 import java.util.List;
 

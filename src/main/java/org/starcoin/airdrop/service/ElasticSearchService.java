@@ -43,8 +43,29 @@ public class ElasticSearchService {
         this.transactionEventIndexPrefix = transactionEventIndexPrefix;
     }
 
-    public List<TransactionVoteChangedEvent> findTransactionEventsByProposalIdAndProposer(Long proposalId, String proposer, long fromTimestamp, long toTimestamp) throws IOException, DeserializationError {
-        String transactionEventIndex = transactionEventIndexPrefix + (transactionEventIndexPrefix.endsWith(".") ? "" : ".") + TRANSACTION_EVENT_INDEX;
+    public static void copyProperties(TransactionVoteChangedEvent src, StarcoinVoteChangedEvent trg) {
+        trg.setBlockHash(src.event.getBlockHash());
+        trg.setBlockNumber(new BigInteger(src.event.getBlockNumber()));
+        trg.setTransactionHash(src.event.getTransactionHash());
+        trg.setTransactionIndex(BigInteger.valueOf(src.event.getTransactionIndex()));
+        trg.setEventKey(src.event.getEventKey());
+        trg.setEventSequenceNumber(new BigInteger(src.event.getEventSeqNumber()));
+        trg.setTypeTag(src.event.getTypeTag());
+        trg.setData(src.event.getData());
+        trg.setProposalId(src.getProposalId());
+        trg.setProposer(src.getProposer());
+        trg.setVoter(src.getVoter());
+        trg.setVoteAmount(src.getVoteAmount());
+        trg.setAgreeVote(src.getAgree());
+        trg.setVoteTimestamp(src.getTimestamp());
+    }
+
+    public List<TransactionVoteChangedEvent> findTransactionEventsByProposalIdAndProposer(Long proposalId,
+                                                                                          String proposer,
+                                                                                          long fromTimestamp,
+                                                                                          long toTimestamp) throws IOException, DeserializationError {
+        String transactionEventIndex = transactionEventIndexPrefix
+                + (transactionEventIndexPrefix.endsWith(".") ? "" : ".") + TRANSACTION_EVENT_INDEX;
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
         boolQuery.must(QueryBuilders.matchQuery("tag_name", "VoteChangedEvent"));
         boolQuery.must(QueryBuilders.rangeQuery("timestamp").from(fromTimestamp).to(toTimestamp));
@@ -74,7 +95,8 @@ public class ElasticSearchService {
         return result;
     }
 
-    private List<TransactionVoteChangedEvent> filterAndConvertSearchHits(SearchResponse searchResponse, Long proposalId, String proposerStr) throws DeserializationError {
+    private List<TransactionVoteChangedEvent> filterAndConvertSearchHits(SearchResponse searchResponse,
+                                                                         Long proposalId, String proposerStr) throws DeserializationError {
         SearchHit[] searchHit = searchResponse.getHits().getHits();
         List<TransactionVoteChangedEvent> transactions = new ArrayList<>();
         for (SearchHit hit : searchHit) {
@@ -89,23 +111,6 @@ public class ElasticSearchService {
             transactions.add(new TransactionVoteChangedEvent(event, data));
         }
         return transactions;
-    }
-
-    public static void copyProperties(TransactionVoteChangedEvent src, StarcoinVoteChangedEvent trg) {
-        trg.setBlockHash(src.event.getBlockHash());
-        trg.setBlockNumber(new BigInteger(src.event.getBlockNumber()));
-        trg.setTransactionHash(src.event.getTransactionHash());
-        trg.setTransactionIndex(BigInteger.valueOf(src.event.getTransactionIndex()));
-        trg.setEventKey(src.event.getEventKey());
-        trg.setEventSequenceNumber(new BigInteger(src.event.getEventSeqNumber()));
-        trg.setTypeTag(src.event.getTypeTag());
-        trg.setData(src.event.getData());
-        trg.setProposalId(src.getProposalId());
-        trg.setProposer(src.getProposer());
-        trg.setVoter(src.getVoter());
-        trg.setVoteAmount(src.getVoteAmount());
-        trg.setAgreeVote(src.getAgree());
-        trg.setVoteTimestamp(src.getTimestamp());
     }
 
     public static class TransactionVoteChangedEvent {

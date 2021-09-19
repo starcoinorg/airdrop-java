@@ -6,10 +6,6 @@ public class DomainError extends RuntimeException {
 
     private String name;
 
-    public String getName() {
-        return name;
-    }
-
     public DomainError() {
     }
 
@@ -30,6 +26,10 @@ public class DomainError extends RuntimeException {
         DomainError error = new DomainError(message);
         error.name = name;
         return error;
+    }
+
+    public String getName() {
+        return name;
     }
 
 }

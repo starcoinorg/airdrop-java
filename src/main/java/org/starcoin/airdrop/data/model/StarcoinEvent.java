@@ -4,7 +4,6 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.starcoin.airdrop.DomainError;
 
-
 import javax.persistence.*;
 import java.math.BigInteger;
 
