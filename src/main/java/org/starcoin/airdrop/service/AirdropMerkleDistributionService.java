@@ -64,7 +64,7 @@ public class AirdropMerkleDistributionService {
     private String airdropFunctionAddress;
 
     @Value("${starcoin.airdrop.token-type}")
-    private String airdropTokenType;
+    private String airdropTokenType; // default: "0x00000000000000000000000000000001::STC::STC"
 
     public AirdropMerkleDistributionService(@Value("${starcoin.airdrop.owner-private-key}") String airdropOwnerPrivateKey,
                                             @Value("${starcoin.json-rpc-url}") String jsonRpcUrl) throws MalformedURLException {
@@ -99,26 +99,38 @@ public class AirdropMerkleDistributionService {
     private void updateProcessOnChainTransaction(Long processId, String transactionHash) {
         VoteRewardProcess process = voteRewardProcessRepository.findById(processId).orElseThrow(() -> new RuntimeException("Cannot find process by Id: " + processId));
         process.setOnChainTransactionHash(transactionHash);
-        //todo save more message.
+        process.setMessage("On-chain transaction submitted.");
         voteRewardProcessRepository.save(process);
     }
 
     public String revokeOnChain(Long processId) {
         VoteRewardProcess process = voteRewardProcessRepository.findById(processId).orElseThrow(() -> new RuntimeException("Cannot find process by Id: " + processId));
         ApiMerkleTree apiMerkleTree = JSON.parseObject(process.getAirdropJson(), ApiMerkleTree.class);
+        String tokenType = apiMerkleTree.getTokenType();
+        long airdropId = apiMerkleTree.getAirDropId();
+        String rootHash = apiMerkleTree.getRoot();
+        String transactionHash = revokeOnChain(tokenType, airdropId, rootHash);
+        updateProcessRevokeOnChainTransaction(process, transactionHash);
+        return transactionHash;
+    }
+
+    public String revokeOnChain(Long airdropId, String rootHash) {
+        return revokeOnChain(this.airdropTokenType, airdropId, rootHash);
+    }
+
+    public String revokeOnChain(String tokenType, long airdropId, String rootHash) {
         TransactionPayload transactionPayload = StarcoinTransactionPayloadUtils
                 .encodeMerkleDistributorScriptRevokeFunction(airdropFunctionAddress,
-                        apiMerkleTree.getTokenType(), apiMerkleTree.getAirDropId(), apiMerkleTree.getRoot()
+                        tokenType, airdropId, rootHash
                 );
         String transactionHash = createTransactionAndSignAndSubmit(transactionPayload);
         LOG.info("Submit MerkleDistributorScript-revoke_airdrop transaction on-chain. Transaction hash: " + transactionHash);
-        updateProcessRevokeOnChainTransaction(process, transactionHash);
         return transactionHash;
     }
 
     private void updateProcessRevokeOnChainTransaction(VoteRewardProcess process, String revokeTransactionHash) {
         process.setRevokeOnChainTransactionHash(revokeTransactionHash);
-        //todo save more message.
+        process.setMessage("Revoke on-chain transaction submitted.");
         voteRewardProcessRepository.save(process);
     }
 
@@ -167,7 +179,7 @@ public class AirdropMerkleDistributionService {
         String json = JSON.toJSONString(apiMerkleTree, true);
         //System.out.println(json);
         process.setAirdropJson(json);
-        //todo save more message.
+        process.setMessage("Airdrop merkle distribution JSON file created.");
         voteRewardProcessRepository.save(process);
         voteRewardProcessRepository.flush();
         return apiMerkleTree;

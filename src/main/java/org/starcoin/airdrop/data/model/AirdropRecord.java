@@ -5,7 +5,9 @@ import java.math.BigInteger;
 import java.util.Date;
 
 @Entity
-@Table(name = "airdrop_records")
+@Table(name = "airdrop_records", uniqueConstraints = {
+        @UniqueConstraint(name = "UniqueAirdropAddress", columnNames = {"airdrop_id", "address"})
+})
 public class AirdropRecord {
 
     //PRIMARY KEY (`id`),

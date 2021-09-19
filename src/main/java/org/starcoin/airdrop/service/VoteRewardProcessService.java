@@ -42,6 +42,9 @@ public class VoteRewardProcessService {
     private AirdropProjectService airdropProjectService;
 
     @Autowired
+    private AirdropRecordService airdropRecordService;
+
+    @Autowired
     private AirdropMerkleDistributionService airdropMerkleDistributionService;
 
     public VoteRewardProcess getVoteRewardProcess(Long processId) {
@@ -87,6 +90,7 @@ public class VoteRewardProcessService {
         Long projId = airdropProjectService.addProject(v.getChainId(), v.getName(), new Date(v.getVoteStartTimestamp()), new Date(v.getVoteEndTimestamp()));
         ApiMerkleTree apiMerkleTree = airdropMerkleDistributionService.createAirdropMerkleTreeAndUpdateOnChain(v.getProcessId(), projId);
         airdropProjectService.updateProject(projId, apiMerkleTree.getOwnerAddress(), apiMerkleTree.getRoot());
+        airdropRecordService.addAirdropRecords(apiMerkleTree);
         // ------------------------------
         updateVoteRewardProcessStatusProcessed(v.getProcessId());
     }
