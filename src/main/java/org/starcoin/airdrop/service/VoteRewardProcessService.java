@@ -42,7 +42,7 @@ public class VoteRewardProcessService {
     private AirdropProjectService airdropProjectService;
 
     @Autowired
-    private MerkleTreeService merkleTreeService;
+    private AirdropMerkleDistributionService airdropMerkleDistributionService;
 
     public VoteRewardProcess getVoteRewardProcess(Long processId) {
         return voteRewardProcessRepository.findById(processId).orElse(null);
@@ -85,7 +85,7 @@ public class VoteRewardProcessService {
             LOG.info("Adjusted rewards under total amount limit: " + TOTAL_REWARD_AMOUNT_LIMIT);
         }
         Long projId = airdropProjectService.addProject(v.getChainId(), v.getName(), new Date(v.getVoteStartTimestamp()), new Date(v.getVoteEndTimestamp()));
-        ApiMerkleTree apiMerkleTree = merkleTreeService.createAirdropMerkleTreeAndUpdateOnChain(v.getProcessId(), projId);
+        ApiMerkleTree apiMerkleTree = airdropMerkleDistributionService.createAirdropMerkleTreeAndUpdateOnChain(v.getProcessId(), projId);
         airdropProjectService.updateProject(projId, apiMerkleTree.getOwnerAddress(), apiMerkleTree.getRoot());
         // ------------------------------
         updateVoteRewardProcessStatusProcessed(v.getProcessId());

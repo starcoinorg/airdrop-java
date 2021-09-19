@@ -47,7 +47,7 @@ class AirdropApplicationTests {
     AirdropProjectService airdropProjectService;
 
     @Autowired
-    MerkleTreeService merkleTreeService;
+    AirdropMerkleDistributionService airdropMerkleDistributionService;
 
     //
     // A test proposal in barnard network:
@@ -82,10 +82,13 @@ class AirdropApplicationTests {
 
     @Test
     void contextLoads() {
-        merkleTreeService.createAirdropMerkleTreeAndUpdateOnChain(8L, 0L);
+        airdropMerkleDistributionService.revokeOnChain(8L);
         if (true) return;
 
-        Long prjId = airdropProjectService.addProject("Test prj. " + System.currentTimeMillis(), new Date(), new Date());
+        airdropMerkleDistributionService.createAirdropMerkleTreeAndUpdateOnChain(8L, 0L);
+        if (true) return;
+
+        Long prjId = airdropProjectService.addProject(1, "Test prj. " + System.currentTimeMillis(), new Date(), new Date());
         System.out.println(prjId);
         if (true) return;
 

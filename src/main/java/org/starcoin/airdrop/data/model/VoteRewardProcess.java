@@ -62,7 +62,14 @@ public class VoteRewardProcess {
     @Basic(fetch = FetchType.LAZY)
     private String airdropJson;
 
-    // todo add on-chain hash field???
+    /**
+     * Create airdrop on-chain transaction hash.
+     */
+    @Column(length = 66, nullable = false)
+    private String onChainTransactionHash;
+
+    @Column(length = 66, nullable = false)
+    private String revokeOnChainTransactionHash;
 
     @Version
     private Long version;
@@ -207,4 +214,21 @@ public class VoteRewardProcess {
     public void setName(String name) {
         this.name = name;
     }
+
+    public String getOnChainTransactionHash() {
+        return onChainTransactionHash;
+    }
+
+    public void setOnChainTransactionHash(String onChainTransactionHash) {
+        this.onChainTransactionHash = onChainTransactionHash;
+    }
+
+    public String getRevokeOnChainTransactionHash() {
+        return revokeOnChainTransactionHash;
+    }
+
+    public void setRevokeOnChainTransactionHash(String revokeOnChainTransactionHash) {
+        this.revokeOnChainTransactionHash = revokeOnChainTransactionHash;
+    }
+
 }

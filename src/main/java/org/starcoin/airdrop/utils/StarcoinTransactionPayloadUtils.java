@@ -1,5 +1,6 @@
 package org.starcoin.airdrop.utils;
 
+import com.google.common.collect.Lists;
 import com.novi.bcs.BcsSerializer;
 import com.novi.serde.Bytes;
 import com.novi.serde.Int128;
@@ -11,6 +12,26 @@ import java.math.BigInteger;
 import java.util.Collections;
 
 public class StarcoinTransactionPayloadUtils {
+
+    public static TransactionPayload encodeMerkleDistributorScriptRevokeFunction(String functionAddress,
+                                                                                 String tokenType,
+                                                                                 Long airdropId,
+                                                                                 String root) {
+
+        ScriptFunction.Builder script_function_builder = new ScriptFunction.Builder();
+        script_function_builder.ty_args = Collections.singletonList(TypeUtils.parseTypeTag(tokenType));
+        script_function_builder.args = java.util.Arrays.asList(
+                encode_u64_argument(airdropId),
+                encode_u8vector_argument(new Bytes(CommonUtils.hexToByteArray(root)))
+        );
+        script_function_builder.function = new Identifier("revoke_airdrop");
+        script_function_builder.module = new ModuleId(
+                AccountAddress.valueOf(CommonUtils.hexToByteArray(functionAddress)),
+                new Identifier("MerkleDistributorScript"));
+        TransactionPayload.ScriptFunction.Builder builder = new TransactionPayload.ScriptFunction.Builder();
+        builder.value = script_function_builder.build();
+        return builder.build();
+    }
 
     /**
      * curl --location --request POST 'https://barnard-seed.starcoin.org' \
@@ -28,11 +49,6 @@ public class StarcoinTransactionPayloadUtils {
                                                                                  String root,
                                                                                  BigInteger amount,
                                                                                  Long proofsSize) {
-        //        chainService.call_function(apiMerkleTree.getFunctionAddress() + "::MerkleDistributorScript::create",
-        //                Lists.newArrayList(apiMerkleTree.getTokenType()),
-        //                Lists.newArrayList(apiMerkleTree.getAirDropId() + "", apiMerkleTree.getRoot(),
-        //                amount.toString(), apiMerkleTree.getProofs().size() + "")
-        //        );
         ScriptFunction.Builder script_function_builder = new ScriptFunction.Builder();
         script_function_builder.ty_args = Collections.singletonList(TypeUtils.parseTypeTag(tokenType));
         script_function_builder.args = java.util.Arrays.asList(
@@ -45,7 +61,6 @@ public class StarcoinTransactionPayloadUtils {
         script_function_builder.module = new ModuleId(
                 AccountAddress.valueOf(CommonUtils.hexToByteArray(functionAddress)),
                 new Identifier("MerkleDistributorScript"));
-
         TransactionPayload.ScriptFunction.Builder builder = new TransactionPayload.ScriptFunction.Builder();
         builder.value = script_function_builder.build();
         return builder.build();

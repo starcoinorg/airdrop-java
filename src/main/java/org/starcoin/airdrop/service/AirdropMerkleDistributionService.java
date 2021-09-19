@@ -36,28 +36,38 @@ import java.util.stream.Collectors;
 import static org.starcoin.airdrop.utils.StarcoinOnChainUtils.*;
 
 @Service
-public class MerkleTreeService {
+public class AirdropMerkleDistributionService {
     public static final long TRANSACTION_EXPIRATION_SECONDS = 2 * 60 * 60L; // two hours?
-    private static final Logger LOG = LoggerFactory.getLogger(MerkleTreeService.class);
+
+    private static final Logger LOG = LoggerFactory.getLogger(AirdropMerkleDistributionService.class);
+
     private static final BigInteger DEFAULT_GAS_LIMIT = BigInteger.valueOf(10000000);
+
     private final String airdropOwnerPrivateKey;
 
     private final String airdropOwnerAddress;
+
     private final String jsonRpcUrl;
+
     private final JSONRPC2Session jsonRpcSession;
+
     @Autowired
     private VoteRewardRepository voteRewardRepository;
+
     @Autowired
     private VoteRewardProcessRepository voteRewardProcessRepository;
+
     @Value("${starcoin.chain-id}")
     private Integer chainId;
+
     @Value("${starcoin.airdrop.function-address}")
     private String airdropFunctionAddress;
+
     @Value("${starcoin.airdrop.token-type}")
     private String airdropTokenType;
 
-    public MerkleTreeService(@Value("${starcoin.airdrop.owner-private-key}") String airdropOwnerPrivateKey,
-                             @Value("${starcoin.json-rpc-url}") String jsonRpcUrl) throws MalformedURLException {
+    public AirdropMerkleDistributionService(@Value("${starcoin.airdrop.owner-private-key}") String airdropOwnerPrivateKey,
+                                            @Value("${starcoin.json-rpc-url}") String jsonRpcUrl) throws MalformedURLException {
         this.jsonRpcUrl = jsonRpcUrl;
         this.jsonRpcSession = new JSONRPC2Session(new URL(this.jsonRpcUrl));
         this.airdropOwnerPrivateKey = airdropOwnerPrivateKey;
@@ -72,20 +82,47 @@ public class MerkleTreeService {
     }
 
     public ApiMerkleTree createAirdropMerkleTreeAndUpdateOnChain(Long processId, Long airdropId) {
-        ApiMerkleTree apiMerkleTree = createAirdropMerkleTree(processId, airdropId);
+        ApiMerkleTree apiMerkleTree = createAirdropMerkleTreeAndSave(processId, airdropId);
         BigInteger amount = apiMerkleTree.getProofs().stream().map(ApiMerkleProof::getAmount)
                 .reduce(BigInteger::add).orElseThrow(() -> new RuntimeException("Null amount."));
-        //        chainService.call_function(apiMerkleTree.getFunctionAddress() + "::MerkleDistributorScript::create",
-        //                Lists.newArrayList(apiMerkleTree.getTokenType()),
-        //                Lists.newArrayList(apiMerkleTree.getAirDropId() + "", apiMerkleTree.getRoot(),
-        //                amount.toString(), apiMerkleTree.getProofs().size() + "")
-        //        );
         TransactionPayload transactionPayload = StarcoinTransactionPayloadUtils
                 .encodeMerkleDistributorScriptCreateFunction(airdropFunctionAddress,
                         apiMerkleTree.getTokenType(), apiMerkleTree.getAirDropId(), apiMerkleTree.getRoot(),
                         amount, (long) apiMerkleTree.getProofs().size()
                 );
+        String transactionHash = createTransactionAndSignAndSubmit(transactionPayload);
+        LOG.info("Submit MerkleDistributorScript-create transaction on-chain. Transaction hash: " + transactionHash);
+        updateProcessOnChainTransaction(processId, transactionHash);
+        return apiMerkleTree;
+    }
 
+    private void updateProcessOnChainTransaction(Long processId, String transactionHash) {
+        VoteRewardProcess process = voteRewardProcessRepository.findById(processId).orElseThrow(() -> new RuntimeException("Cannot find process by Id: " + processId));
+        process.setOnChainTransactionHash(transactionHash);
+        //todo save more message.
+        voteRewardProcessRepository.save(process);
+    }
+
+    public String revokeOnChain(Long processId) {
+        VoteRewardProcess process = voteRewardProcessRepository.findById(processId).orElseThrow(() -> new RuntimeException("Cannot find process by Id: " + processId));
+        ApiMerkleTree apiMerkleTree = JSON.parseObject(process.getAirdropJson(), ApiMerkleTree.class);
+        TransactionPayload transactionPayload = StarcoinTransactionPayloadUtils
+                .encodeMerkleDistributorScriptRevokeFunction(airdropFunctionAddress,
+                        apiMerkleTree.getTokenType(), apiMerkleTree.getAirDropId(), apiMerkleTree.getRoot()
+                );
+        String transactionHash = createTransactionAndSignAndSubmit(transactionPayload);
+        LOG.info("Submit MerkleDistributorScript-revoke_airdrop transaction on-chain. Transaction hash: " + transactionHash);
+        updateProcessRevokeOnChainTransaction(process, transactionHash);
+        return transactionHash;
+    }
+
+    private void updateProcessRevokeOnChainTransaction(VoteRewardProcess process, String revokeTransactionHash) {
+        process.setRevokeOnChainTransactionHash(revokeTransactionHash);
+        //todo save more message.
+        voteRewardProcessRepository.save(process);
+    }
+
+    private String createTransactionAndSignAndSubmit(TransactionPayload transactionPayload) {
         RawUserTransaction rawUserTransaction = createRawUserTransaction(
                 this.chainId,
                 AccountAddressUtils.create(this.airdropOwnerAddress),
@@ -98,7 +135,7 @@ public class MerkleTreeService {
         Ed25519PrivateKey ed25519PrivateKey = SignatureUtils.strToPrivateKey(this.airdropOwnerPrivateKey);
         SignedUserTransaction signedUserTransaction = SignatureUtils.signTxn(ed25519PrivateKey,
                 rawUserTransaction);
-        byte[] signedMessage = new byte[0];
+        byte[] signedMessage;
         try {
             signedMessage = signedUserTransaction.bcsSerialize();
         } catch (SerializationError error) {
@@ -106,11 +143,10 @@ public class MerkleTreeService {
             throw new RuntimeException(error);
         }
         String transactionHash = submitHexTransaction(this.jsonRpcSession, signedMessage);
-        LOG.info("Submit MerkleDistributorScript-create transaction on-chain. Transaction hash: " + transactionHash);
-        return apiMerkleTree;
+        return transactionHash;
     }
 
-    private ApiMerkleTree createAirdropMerkleTree(Long processId, Long airdropId) {
+    private ApiMerkleTree createAirdropMerkleTreeAndSave(Long processId, Long airdropId) {
         VoteRewardProcess process = voteRewardProcessRepository.findById(processId).orElseThrow(() -> new RuntimeException("Cannot find process by Id: " + processId));
         if (!chainId.equals(process.getChainId())) {
             throw new RuntimeException("Wrong chain Id. Must be: " + chainId);
@@ -127,6 +163,17 @@ public class MerkleTreeService {
         if (airdropId == null) {
             throw new IllegalArgumentException("Airdrop Id is null.");
         }
+        ApiMerkleTree apiMerkleTree = createApiMerkleTree(airdropId, proposalId);
+        String json = JSON.toJSONString(apiMerkleTree, true);
+        //System.out.println(json);
+        process.setAirdropJson(json);
+        //todo save more message.
+        voteRewardProcessRepository.save(process);
+        voteRewardProcessRepository.flush();
+        return apiMerkleTree;
+    }
+
+    private ApiMerkleTree createApiMerkleTree(Long airdropId, Long proposalId) {
         // List<CSVRecord> records = Lists.newArrayList(csvToBean.iterator());
         List<Map<String, Object>> rs = voteRewardRepository.sumRewardAmountGroupByVoter(proposalId);
         List<CSVRecord> records = rs.stream().map(r -> {
@@ -150,11 +197,6 @@ public class MerkleTreeService {
         apiMerkleTree.setOwnerAddress(airdropOwnerAddress);
 
         apiMerkleTree.setChainId(chainId);
-        String json = JSON.toJSONString(apiMerkleTree, true);
-        //System.out.println(json);
-        process.setAirdropJson(json);
-        voteRewardProcessRepository.save(process);
-        voteRewardProcessRepository.flush();
         return apiMerkleTree;
     }
 
