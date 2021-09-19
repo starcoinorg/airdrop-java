@@ -183,7 +183,8 @@ public class AirdropMerkleDistributionService {
         try {
             apiMerkleTree = createApiMerkleTree(airdropId, proposalId);
         } catch (RuntimeException e) {
-            process.setMessage("Create merkle tree error." + e.getMessage());
+            LOG.error("Create merkle tree error.", e);
+            process.setMessage("Create merkle tree error.");
             voteRewardProcessRepository.save(process);
             throw e;
         }

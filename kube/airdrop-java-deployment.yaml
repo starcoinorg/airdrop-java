@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: airdrop-java
-        image: ghcr.io/starcoinorg/starcoin_airdrop_java:sha-970047d
+        image: ghcr.io/starcoinorg/starcoin_airdrop_java:sha-8b456ab
         ports:
         - containerPort: 8787
         env:
@@ -46,7 +46,7 @@ spec:
         - name: STARCOIN_ES_PORT
           value: "443"
         - name: STARCOIN_ES_TXN_EVENT_IDX_PREFIX
-          value: "main"
+          value: "main.0727"
         - name: STARCOIN_ES_USER
           value: elastic
         - name: STARCOIN_ES_PWD
@@ -54,9 +54,9 @@ spec:
             secretKeyRef:
               name: elasticsearch-pw-elastic
               key: password
-#        - name: STARCOIN_AIRDROP_OWNER_PK
-#          valueFrom:
-#            secretKeyRef:
-#              name: starcoin-airdrop-secrets
-#              key: ownerpk
+        - name: STARCOIN_AIRDROP_OWNER_PK
+          valueFrom:
+            secretKeyRef:
+              name: starcoin-airdrop-secret
+              key: ownerpk
 

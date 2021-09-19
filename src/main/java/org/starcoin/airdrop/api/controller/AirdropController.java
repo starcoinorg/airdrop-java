@@ -71,6 +71,10 @@ public class AirdropController {
         return voteRewardProcessService.createVoteRewardProcess(voteRewardProcess);
     }
 
+    // --------------------------------------------
+    //todo reset process to 'CREATED' status??
+    // --------------------------------------------
+
     @GetMapping("exportAirdropJson")
     public void exportAirdropJson(HttpServletResponse response,
                                   @RequestParam("processId") Long processId

@@ -76,7 +76,12 @@ public class VoteRewardProcessService {
         updateStatusProcessing(v);
         // ------------------------------
         starcoinEventRepository.deactiveEventsByProposalId(v.getProposalId());
-        starcoinVoteChangedEventService.findESEventsAndSave(v.getProposalId(), v.getProposer(), v.getVoteStartTimestamp(), v.getVoteEndTimestamp());
+        try {
+            starcoinVoteChangedEventService.findESEventsAndSave(v.getProposalId(), v.getProposer(), v.getVoteStartTimestamp(), v.getVoteEndTimestamp());
+        } catch (RuntimeException runtimeException) {
+            updateVoteRewardProcessingMessage(v.getProcessId(), "Pull elasticsearch events or save events error.");
+            throw runtimeException;
+        }
         List<StarcoinVoteChangedEvent> events = starcoinEventRepository.findStarcoinVoteChangedEventsByProposalIdOrderByVoteTimestamp(v.getProposalId());
         voteRewardRepository.deactiveVoteRewardsByProposalId(v.getProposalId());
         voteRewardService.addOrUpdateVoteRewards(v.getProposalId(), events);
@@ -99,6 +104,15 @@ public class VoteRewardProcessService {
         airdropRecordService.addAirdropRecords(apiMerkleTree);
         // ------------------------------
         updateVoteRewardProcessStatusProcessed(v.getProcessId());
+    }
+
+    private void updateVoteRewardProcessingMessage(Long processId, String message) {
+        VoteRewardProcess v = voteRewardProcessRepository.findById(processId).orElseThrow(() -> new RuntimeException("Cannot find by process by Id: " + processId));
+        v.setMessage(message);
+        v.setUpdatedBy("admin");
+        v.setUpdatedAt(System.currentTimeMillis());
+        voteRewardProcessRepository.save(v);
+        voteRewardProcessRepository.flush();
     }
 
     private void updateVoteRewardProcessStatusProcessed(Long processId) {
