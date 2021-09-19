@@ -24,9 +24,9 @@ curl -H "Content-Type: application/json" -X POST \
 * chainId：链 Id。比如 barnard 测试链的 Id 是 251。
 * voteStartTimestamp：投票开始时间。用于过滤需要处理的投票事件，加快处理速度。
 * voteEndTimestamp：投票结束时间（很重要）。用于计算奖励金额。
-* onChainDisabled：设置为 true（示例见下）时则处理流程不包括空投奖励数据上链的操作。操作者可以导出空投数据 JSON 文件（导入方法见下）后手动上链。
+* onChainDisabled：设置为 true（示例见下）时，则处理流程不包括将空投奖励数据提交上链的操作。操作者可以导出空投数据 JSON 文件（导出方法见下）后手动上链。
 
-也可以使用 ISO 8601 格式的日期时间字符串。字符串中需要存在时区指示信息，比如 `Z` 表示 UTC 时间/零时区。 例子：
+投票开始与结束时间参数也可以使用 ISO 8601 格式的日期时间字符串。字符串中需要存在时区指示信息，比如 `Z` 表示 UTC 时间/零时区。 例子：
 
 ```shell
 curl -H "Content-Type: application/json" -X POST \
@@ -36,8 +36,8 @@ curl -H "Content-Type: application/json" -X POST \
 
 参数说明：
 
-* voteStartDateTime：投票结束时间字符串，必须是 ISO 8601 格式。
-* voteEndDateTime：投票结束时间字符串，必须是 ISO 8601 格式。
+* voteStartDateTime：投票结束时间字符串。必须是 ISO 8601 格式。
+* voteEndDateTime：投票结束时间字符串。必须是 ISO 8601 格式。
 * onChainDisabled：设置为 true 则处理流程不包括上链操作。
 
 如果创建流程成功，在返回的结果中存在流程 Id（`processId`）。
@@ -70,7 +70,7 @@ http://localhost:8787/v1/exportAirdropJson?processId={processId}
 
 ### Revoke 已上链的空投
 
-通过输入 airdrop Id 与 root hash 作为参数，revoke 已上链的空投。 例子（假设 airdrop Id 为 12）：
+通过输入 airdrop Id 与空投数据的 root hash 作为参数，revoke 已上链的空投。 例子（假设 airdrop Id 为 12）：
 
 ```shell
 curl -H "Content-Type: application/json" -X POST \
@@ -79,10 +79,10 @@ curl -H "Content-Type: application/json" -X POST \
 
 查询参数说明：
 
-* airdropId：空投 Id（项目 Id）。
-* root：空投证明根哈希值（root hash）。
+* airdropId：空投 Id（空投项目 Id）。
+* root：空投数据的根哈希值（root hash）。
 
-也可以通过 process Id 来 revoke 链上的空投记录。例子（假设 porcess Id 为 8）：
+也可以通过 process Id 来 revoke 链上的空投记录。例子（假设 process Id 为 8）：
 
 ```shell
 curl -H "Content-Type: application/json" -X POST \
@@ -93,6 +93,7 @@ curl -H "Content-Type: application/json" -X POST \
 
 * processId：处理流程 Id。
 
+
 ### 更多 API 描述
 
 见 Swagger UI：
@@ -100,6 +101,7 @@ curl -H "Content-Type: application/json" -X POST \
 ```
 http://localhost:8787/swagger-ui/index.html
 ```
+
 
 ## 参考信息
 
