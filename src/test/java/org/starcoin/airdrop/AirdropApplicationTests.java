@@ -82,7 +82,7 @@ class AirdropApplicationTests {
 
     @Test
     void contextLoads() {
-        airdropMerkleDistributionService.revokeOnChain(8L);
+        airdropMerkleDistributionService.revokeOnChain(15L);
         if (true) return;
 
         airdropMerkleDistributionService.createAirdropMerkleTreeAndUpdateOnChain(8L, 0L);

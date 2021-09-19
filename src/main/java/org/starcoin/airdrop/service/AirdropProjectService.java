@@ -18,10 +18,10 @@ public class AirdropProjectService {
      * Add airdrop project.
      *
      * @param chainId   chain Id.
-     * @param name      prject name(process name).
+     * @param name      project name(process name).
      * @param startTime vote started at.
      * @param endTime   vote ended at.
-     * @return Project Id.
+     * @return Airdrop Id.(Project Id.)
      */
     @Transactional
     public Long addProject(Integer chainId, String name, Date startTime, Date endTime) {

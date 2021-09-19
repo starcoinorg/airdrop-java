@@ -65,11 +65,22 @@ public class VoteRewardProcess {
     /**
      * Create airdrop on-chain transaction hash.
      */
-    @Column(length = 66, nullable = false)
+    @Column(length = 66)
     private String onChainTransactionHash;
 
-    @Column(length = 66, nullable = false)
+    @Column(length = 66)
     private String revokeOnChainTransactionHash;
+
+    @Column
+    private Boolean onChainDisabled;
+
+    public Boolean getOnChainDisabled() {
+        return onChainDisabled;
+    }
+
+    public void setOnChainDisabled(Boolean onChainDisabled) {
+        this.onChainDisabled = onChainDisabled;
+    }
 
     @Version
     private Long version;

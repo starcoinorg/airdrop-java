@@ -87,9 +87,15 @@ public class VoteRewardProcessService {
             voteRewardService.adjustRewardsUnderLimit(v.getProposalId(), totalRewardAmount, TOTAL_REWARD_AMOUNT_LIMIT);
             LOG.info("Adjusted rewards under total amount limit: " + TOTAL_REWARD_AMOUNT_LIMIT);
         }
-        Long projId = airdropProjectService.addProject(v.getChainId(), v.getName(), new Date(v.getVoteStartTimestamp()), new Date(v.getVoteEndTimestamp()));
-        ApiMerkleTree apiMerkleTree = airdropMerkleDistributionService.createAirdropMerkleTreeAndUpdateOnChain(v.getProcessId(), projId);
-        airdropProjectService.updateProject(projId, apiMerkleTree.getOwnerAddress(), apiMerkleTree.getRoot());
+        Long airdropId = airdropProjectService.addProject(v.getChainId(), v.getName(), new Date(v.getVoteStartTimestamp()), new Date(v.getVoteEndTimestamp()));
+        ApiMerkleTree apiMerkleTree;
+        boolean onChain = v.getOnChainDisabled() == null || !v.getOnChainDisabled();
+        if (onChain) {
+            apiMerkleTree = airdropMerkleDistributionService.createAirdropMerkleTreeAndUpdateOnChain(v.getProcessId(), airdropId);
+        } else {
+            apiMerkleTree = airdropMerkleDistributionService.createAirdropMerkleTreeAndSave(v.getProcessId(), airdropId);
+        }
+        airdropProjectService.updateProject(airdropId, apiMerkleTree.getOwnerAddress(), apiMerkleTree.getRoot());
         airdropRecordService.addAirdropRecords(apiMerkleTree);
         // ------------------------------
         updateVoteRewardProcessStatusProcessed(v.getProcessId());

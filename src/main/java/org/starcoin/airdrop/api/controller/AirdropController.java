@@ -8,6 +8,7 @@ import org.starcoin.airdrop.data.model.VoteRewardProcess;
 import org.starcoin.airdrop.service.AirdropMerkleDistributionService;
 import org.starcoin.airdrop.service.VoteRewardProcessService;
 import org.starcoin.airdrop.service.VoteRewardService;
+import org.starcoin.airdrop.vo.VoteRewardProcessVO;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -60,7 +61,13 @@ public class AirdropController {
     }
 
     @PostMapping("voteRewardProcesses")
-    public VoteRewardProcess postVoteRewardProcess(@RequestBody VoteRewardProcess voteRewardProcess) {
+    public VoteRewardProcess postVoteRewardProcess(@RequestBody VoteRewardProcessVO voteRewardProcess) {
+        if (voteRewardProcess.getChainId() == null) throw new IllegalArgumentException("Chain Id is null.");
+        if (voteRewardProcess.getName() == null) throw new IllegalArgumentException("Process name is null.");
+        if (voteRewardProcess.getVoteStartTimestamp() == null)
+            throw new IllegalArgumentException("Start time is null.");
+        if (voteRewardProcess.getVoteEndTimestamp() == null)
+            throw new IllegalArgumentException("End time is null.");
         return voteRewardProcessService.createVoteRewardProcess(voteRewardProcess);
     }
 

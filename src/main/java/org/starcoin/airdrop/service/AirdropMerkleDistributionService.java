@@ -83,6 +83,10 @@ public class AirdropMerkleDistributionService {
 
     public ApiMerkleTree createAirdropMerkleTreeAndUpdateOnChain(Long processId, Long airdropId) {
         ApiMerkleTree apiMerkleTree = createAirdropMerkleTreeAndSave(processId, airdropId);
+        return updateOnChain(processId, apiMerkleTree);
+    }
+
+    private ApiMerkleTree updateOnChain(Long processId, ApiMerkleTree apiMerkleTree) {
         BigInteger amount = apiMerkleTree.getProofs().stream().map(ApiMerkleProof::getAmount)
                 .reduce(BigInteger::add).orElseThrow(() -> new RuntimeException("Null amount."));
         TransactionPayload transactionPayload = StarcoinTransactionPayloadUtils
@@ -158,7 +162,7 @@ public class AirdropMerkleDistributionService {
         return transactionHash;
     }
 
-    private ApiMerkleTree createAirdropMerkleTreeAndSave(Long processId, Long airdropId) {
+    public ApiMerkleTree createAirdropMerkleTreeAndSave(Long processId, Long airdropId) {
         VoteRewardProcess process = voteRewardProcessRepository.findById(processId).orElseThrow(() -> new RuntimeException("Cannot find process by Id: " + processId));
         if (!chainId.equals(process.getChainId())) {
             throw new RuntimeException("Wrong chain Id. Must be: " + chainId);
@@ -175,7 +179,14 @@ public class AirdropMerkleDistributionService {
         if (airdropId == null) {
             throw new IllegalArgumentException("Airdrop Id is null.");
         }
-        ApiMerkleTree apiMerkleTree = createApiMerkleTree(airdropId, proposalId);
+        ApiMerkleTree apiMerkleTree;
+        try {
+            apiMerkleTree = createApiMerkleTree(airdropId, proposalId);
+        } catch (RuntimeException e) {
+            process.setMessage("Create merkle tree error." + e.getMessage());
+            voteRewardProcessRepository.save(process);
+            throw e;
+        }
         String json = JSON.toJSONString(apiMerkleTree, true);
         //System.out.println(json);
         process.setAirdropJson(json);
