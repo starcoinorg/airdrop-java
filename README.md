@@ -26,14 +26,20 @@ http://localhost:8787/v1/voteRewardProcesses/{processId}
 http://localhost:8787/v1/exportRewardCsv?processId={processId}
 ```
 
-通过输入 airdrop Id 与 root hash 作为参数，revoke 链上的空投记录：
+可以导出生成的奖励空投信息 JSON 文件，通过 HTTP GET 方法请求以下 URL：
+
+```url
+http://localhost:8787/v1/exportAirdropJson?processId={processId}
+```
+
+通过输入 airdrop Id 与 root hash 作为参数，revoke 链上的空投记录。例子（假设 airdrop Id 为 12）：
 
 ```shell
 curl -H "Content-Type: application/json" -X POST \
 "http://localhost:8787/v1/revokeOnChain?airdropId=12&root=0xbcc6b34299c01419d978fbd9ea8c61f37e6bc5e3e4e6c14b917946733bcc87b2"
 ```
 
-或者可以通过 process Id 来 revoke 链上的空投记录：
+或者可以通过 process Id 来 revoke 链上的空投记录，例子（假设 porcess Id 为 8）：
 
 ```shell
 curl -H "Content-Type: application/json" -X POST \

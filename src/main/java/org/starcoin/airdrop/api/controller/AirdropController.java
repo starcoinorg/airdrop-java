@@ -64,6 +64,27 @@ public class AirdropController {
         return voteRewardProcessService.createVoteRewardProcess(voteRewardProcess);
     }
 
+    @GetMapping("exportAirdropJson")
+    public void exportAirdropJson(HttpServletResponse response,
+                                  @RequestParam("processId") Long processId
+    ) throws IOException {
+        VoteRewardProcess voteRewardProcess = voteRewardProcessService.findByIdOrElseThrow(processId);
+        if (voteRewardProcess.isProcessing()) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+        Long proposalId = voteRewardProcess.getProposalId();
+
+        // set file name and content type
+        String filename = "airdrop" + processId + ".json";
+        response.setContentType("text/json");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=\"" + filename + "\"");
+        Writer writer = response.getWriter();
+        writer.write(voteRewardProcess.getAirdropJson());
+        writer.close();
+    }
+
     @GetMapping("exportRewardCsv")
     public void exportRewardCsv(HttpServletResponse response,
                                 @RequestParam("processId") Long processId
@@ -76,7 +97,7 @@ public class AirdropController {
         Long proposalId = voteRewardProcess.getProposalId();
 
         // set file name and content type
-        String filename = "rewards.csv";
+        String filename = "rewards" + processId + ".csv";
         response.setContentType("text/csv");
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
                 "attachment; filename=\"" + filename + "\"");
