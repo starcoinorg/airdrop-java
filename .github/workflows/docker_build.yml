@@ -2,7 +2,7 @@ name: Build Docker and deploy
 on:
   push:
     branches:
-      - main
+      - master
   workflow_dispatch:
   release:
     types: [ published ]
