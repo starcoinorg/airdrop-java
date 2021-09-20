@@ -6,7 +6,7 @@
 
 ### 创建投票奖励处理流程
 
-创建投票奖励处理流程时，需要注意填写正确的投票开始和结束时间戳。时间戳的值应为 epoch milliseconds。
+创建投票奖励处理流程时，需要注意填写正确的投票开始和结束时间戳（timestamp）。时间戳的值应为 epoch milliseconds。
 
 示例：
 
@@ -22,11 +22,11 @@ curl -H "Content-Type: application/json" -X POST \
 * proposer：提案账号地址。
 * name：流程名称（也用作空投项目名称）。必须有唯一性，避免重复处理。
 * chainId：链 Id。比如 barnard 测试链的 Id 是 251。
-* voteStartTimestamp：投票开始时间。用于过滤需要处理的投票事件，加快处理速度。
-* voteEndTimestamp：投票结束时间（很重要）。用于计算奖励金额。
-* onChainDisabled：设置为 true（示例见下）时，则处理流程不包括将空投奖励数据提交上链的操作。操作者可以导出空投数据 JSON 文件（导出方法见下）后手动上链。
+* voteStartTimestamp：投票开始的时间戳。用于过滤需要处理的投票事件，加快处理速度。
+* voteEndTimestamp：投票结束的时间戳（很重要）。用于计算奖励金额。
+* onChainDisabled：如果设置为 true （默认值为 false，上面的示例使用默认值），则处理流程不包括将空投奖励数据提交上链的操作。不过此时操作者可以导出空投数据 JSON 文件（导出方法见下）后，使用文件中的参数信息手动调用链上的合约上链。
 
-投票开始与结束时间参数也可以使用 ISO 8601 格式的日期时间字符串。字符串中需要存在时区指示信息，比如 `Z` 表示 UTC 时间/零时区。 例子：
+投票开始与结束时间参数也可以使用 ISO 8601 格式的日期时间字符串，代替时间戳。字符串中需要存在时区指示信息，比如 `Z` 表示 UTC 时间/零时区，`+08:00` 表示东八区/北京时间。 例子（注意开始与结束时间的参数名称与使用时间戳不同）：
 
 ```shell
 curl -H "Content-Type: application/json" -X POST \
@@ -38,7 +38,7 @@ curl -H "Content-Type: application/json" -X POST \
 
 * voteStartDateTime：投票结束时间字符串。必须是 ISO 8601 格式。
 * voteEndDateTime：投票结束时间字符串。必须是 ISO 8601 格式。
-* onChainDisabled：设置为 true 则处理流程不包括上链操作。
+* onChainDisabled：设置为 true 则处理流程不包括提交空投数据上链的操作。上面的示例设置为 true。
 
 如果创建流程成功，在返回的结果中存在流程 Id（`processId`）。
 
