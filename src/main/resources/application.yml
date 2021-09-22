@@ -33,6 +33,9 @@ spring:
     # 可以指定多个schema，但仅会在第一个 schema 下建立 metadata 表，也仅在第一个 schema 应用 migration sql 脚本，
     # 但 flyway clean 命令会依次在这些 schema 下都执行一遍。
 
+#  jackson:
+#    serialization:
+#      write_dates_as_timestamps: false
 
 jasypt:
   encryptor:

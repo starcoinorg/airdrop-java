@@ -34,7 +34,7 @@ spec:
         - name: STARCOIN_NETWORK
           value: "main"
         - name: STARCOIN_JSON_RPC_URL
-          value: "https://barnard-seed.starcoin.org"
+          value: "https://main-seed.starcoin.org"
 #        - name: STARCOIN_SEEDS
 #          value: "main4.seed.starcoin.org,main5.seed.starcoin.org"
         - name: STARCOIN_CHAIN_ID

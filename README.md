@@ -26,17 +26,19 @@ curl -H "Content-Type: application/json" -X POST \
 * voteEndTimestamp：投票结束的时间戳（很重要）。用于计算奖励金额。
 * onChainDisabled：如果设置为 true （默认值为 false，上面的示例使用默认值），则处理流程不包括将空投奖励数据提交上链的操作。不过此时操作者可以导出空投数据 JSON 文件（导出方法见下）后，使用文件中的参数信息手动调用链上的合约上链。
 
-投票开始与结束时间参数也可以使用 ISO 8601 格式的日期时间字符串，代替时间戳。字符串中需要存在时区指示信息，比如 `Z` 表示 UTC 时间/零时区，`+08:00` 表示东八区/北京时间。 例子（注意开始与结束时间的参数名称与使用时间戳不同）：
+投票开始与结束时间参数也可以使用 ISO 8601 格式的日期时间字符串，代替时间戳。字符串中需要存在时区指示信息，比如 `Z` 表示 UTC 时间/零时区，`+08:00` 表示东八区/北京时间。 
+
+这是一个例子（注意，这里开始时间与结束时间的参数名称与使用时间戳的时候不一样，并且这里指定的时间值是东八区时间/北京时间）：
 
 ```shell
 curl -H "Content-Type: application/json" -X POST \
--d '{"proposalId":29,"proposer":"0x0000000000000000000000000a550c18","name":"TEST-barnard-112","chainId":251,"voteStartDateTime":"2021-01-02T15:50:53Z","voteEndDateTime":"2021-09-16T15:50:53Z","onChainDisabled":true}' \
+-d '{"proposalId":5,"proposer":"0x3aaf92261930d73cdb24e0cc17e2807a","name":"TEST-main-5-2","chainId":1,"voteStartDateTime":"2021-09-09T14:50:00+08:00","voteEndDateTime":"2021-09-16T15:50:53+08:00","onChainDisabled":true}' \
 "http://localhost:8787/v1/voteRewardProcesses/"
 ```
 
 参数说明：
 
-* voteStartDateTime：投票结束时间字符串。必须是 ISO 8601 格式。
+* voteStartDateTime：投票结束时间字符串。必须是 ISO 8601 格式。注意，中国用户在 Web 前端页面上看到时间描述很**可能是北京时间**（比如：https://poll.starcoin.org/polls/detail/5?network=main）。
 * voteEndDateTime：投票结束时间字符串。必须是 ISO 8601 格式。
 * onChainDisabled：设置为 true 则处理流程不包括提交空投数据上链的操作。上面的示例设置为 true。
 
