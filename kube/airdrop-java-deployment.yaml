@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: airdrop-java
-        image: ghcr.io/starcoinorg/starcoin_airdrop_java:sha-7f33b2a
+        image: ghcr.io/starcoinorg/starcoin_airdrop_java:sha-68b0b57
         ports:
         - containerPort: 8787
         env:

@@ -10,6 +10,7 @@ spring:
     password: ${STARCOIN_MYSQL_PWD}
 
   jpa:
+    open-in-view: false
     show-sql: true
     properties:
       hibernate:
