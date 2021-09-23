@@ -55,7 +55,6 @@ spec:
         - name: STARCOIN_AIRDROP_OWNER_PK
           valueFrom:
             secretKeyRef:
-              name: starcoin-airdrop-secret
+              name: barnard-starcoin-airdrop-secret
               key: ownerpk
-              # todo use barnard test PK??
 
