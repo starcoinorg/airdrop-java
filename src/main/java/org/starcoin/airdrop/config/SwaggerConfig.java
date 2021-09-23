@@ -20,6 +20,6 @@ public class SwaggerConfig {
     }
 
     private ApiInfo apiInfo() {
-        return new ApiInfoBuilder().title("Starswap API").description("Starswap API").version("1.0.0").build();
+        return new ApiInfoBuilder().title("Airdrop Java API").description("Airdrop Java Services").version("1.0.0").build();
     }
 }
