@@ -18,6 +18,8 @@ import java.util.List;
 
 @Service
 public class VoteRewardProcessService {
+    public static final Long NO_AIRDROP_ID = -1L;
+
     private static final Logger LOG = LoggerFactory.getLogger(VoteRewardProcessService.class);
 
     //todo config???
@@ -85,16 +87,22 @@ public class VoteRewardProcessService {
         List<StarcoinVoteChangedEvent> events = starcoinEventRepository.findStarcoinVoteChangedEventsByProposalIdOrderByVoteTimestamp(v.getProposalId());
         voteRewardRepository.deactiveVoteRewardsByProposalId(v.getProposalId());
         processVoteRewards(v, events);
-        Long airdropId = airdropProjectService.addProject(v.getChainId(), v.getName(), new Date(v.getVoteStartTimestamp()), new Date(v.getVoteEndTimestamp()));
-        ApiMerkleTree apiMerkleTree;
         boolean onChain = v.getOnChainDisabled() == null || !v.getOnChainDisabled(); // default is on-chain.
+        Long airdropId = onChain
+                ? airdropProjectService.addProject(v.getChainId(), v.getName(), new Date(v.getVoteStartTimestamp()), new Date(v.getVoteEndTimestamp()))
+                : NO_AIRDROP_ID;
+        ApiMerkleTree apiMerkleTree;
         if (onChain) {
+            // todo 在奖励发放之前，检查 privateKey 对应 address，STC 的 balance 应该大于应发放奖励的总额
             apiMerkleTree = airdropMerkleDistributionService.createAirdropMerkleTreeAndUpdateOnChain(v.getProcessId(), airdropId);
+            airdropProjectService.updateProject(airdropId, apiMerkleTree.getOwnerAddress(), apiMerkleTree.getRoot());
+            airdropRecordService.addAirdropRecords(apiMerkleTree);
         } else {
             apiMerkleTree = airdropMerkleDistributionService.createAirdropMerkleTreeAndSave(v.getProcessId(), airdropId);
         }
-        airdropProjectService.updateProject(airdropId, apiMerkleTree.getOwnerAddress(), apiMerkleTree.getRoot());
-        airdropRecordService.addAirdropRecords(apiMerkleTree);
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Airdrop MerkleTree proof created and saved. Root hash: " + apiMerkleTree.getRoot());
+        }
         // ------------------------------
         updateVoteRewardProcessStatusProcessed(v.getProcessId());
     }
