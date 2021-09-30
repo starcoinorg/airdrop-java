@@ -93,7 +93,8 @@ public class VoteRewardProcessService {
                 : NO_AIRDROP_ID;
         ApiMerkleTree apiMerkleTree;
         if (onChain) {
-            // todo 在奖励发放之前，检查 privateKey 对应 address，STC 的 balance 应该大于应发放奖励的总额
+            // 在奖励发放之前，检查 privateKey 对应 address，STC 的 balance 应该大于应发放奖励的总额
+            airdropMerkleDistributionService.assertOwnerAccountHasSufficientBalance(v.getProcessId());
             apiMerkleTree = airdropMerkleDistributionService.createAirdropMerkleTreeAndUpdateOnChain(v.getProcessId(), airdropId);
             airdropProjectService.updateProject(airdropId, apiMerkleTree.getOwnerAddress(), apiMerkleTree.getRoot());
             airdropRecordService.addAirdropRecords(apiMerkleTree);

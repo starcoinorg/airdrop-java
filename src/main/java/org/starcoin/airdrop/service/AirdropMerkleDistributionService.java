@@ -96,11 +96,11 @@ public class AirdropMerkleDistributionService {
                 );
         String transactionHash = createTransactionAndSignAndSubmit(transactionPayload);
         LOG.info("Submit MerkleDistributorScript-create transaction on-chain. Transaction hash: " + transactionHash);
-        updateProcessOnChainTransaction(processId, transactionHash);
+        updateProcessOnChainTransactionHash(processId, transactionHash);
         return apiMerkleTree;
     }
 
-    private void updateProcessOnChainTransaction(Long processId, String transactionHash) {
+    private void updateProcessOnChainTransactionHash(Long processId, String transactionHash) {
         VoteRewardProcess process = voteRewardProcessRepository.findById(processId).orElseThrow(() -> new RuntimeException("Cannot find process by Id: " + processId));
         process.setOnChainTransactionHash(transactionHash);
         process.setMessage("On-chain transaction submitted.");
@@ -224,4 +224,16 @@ public class AirdropMerkleDistributionService {
         return apiMerkleTree;
     }
 
+    public void assertOwnerAccountHasSufficientBalance(Long processId) {
+        VoteRewardProcess process = voteRewardProcessRepository.findById(processId).orElseThrow(() -> new RuntimeException("Cannot find process by Id: " + processId));
+        BigInteger totalRewardAmount = voteRewardRepository.sumTotalRewardAmountByProposalId(process.getProposalId());
+        BigInteger balance = getAccountStcBalance(this.jsonRpcSession, this.airdropOwnerAddress);
+        if (balance.compareTo(totalRewardAmount) < 0) {
+            String msg = "Owner account has NOT sufficient balance. " + balance + " < " + totalRewardAmount;
+            LOG.error(msg);
+            process.setMessage(msg);
+            voteRewardProcessRepository.save(process);
+            throw new RuntimeException(msg);
+        }
+    }
 }
