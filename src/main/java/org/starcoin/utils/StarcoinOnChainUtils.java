@@ -1,4 +1,4 @@
-package org.starcoin.airdrop.utils;
+package org.starcoin.utils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -6,14 +6,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.starcoin.airdrop.rpc.JsonRpcClient;
 import org.starcoin.jsonrpc.client.JSONRPC2Session;
 import org.starcoin.jsonrpc.client.JSONRPC2SessionException;
 import org.starcoin.types.AccountAddress;
 import org.starcoin.types.ChainId;
 import org.starcoin.types.RawUserTransaction;
 import org.starcoin.types.TransactionPayload;
-import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -37,17 +35,11 @@ public class StarcoinOnChainUtils {
     }
 
     public static String submitHexTransaction(JSONRPC2Session jsonRpcSession, byte[] signedMessage) {
-        String hexValue = Numeric.toHexString(signedMessage);
+        String hexValue = HexUtils.toHexString(signedMessage);
         if (LOG.isDebugEnabled())
             LOG.debug("Signed transaction: " + hexValue);
         List<Object> params = Collections.singletonList(hexValue);
-        Object result;
-        try {
-            result = new JsonRpcClient(jsonRpcSession).sendJsonRpc(METHOD_TXPOOL_SUBMIT_HEX_TRANSACTION, params);
-        } catch (JSONRPC2SessionException | JsonProcessingException e) {
-            LOG.error("Submit hex transaction error.");
-            throw new RuntimeException(e);
-        }
+        Object result = new JsonRpcClient(jsonRpcSession).sendJsonRpc(METHOD_TXPOOL_SUBMIT_HEX_TRANSACTION, params);
         if (!(result instanceof String)) {
             throw new RuntimeException("Send JSON RPC error. Unknown result type, result string is: " + result);
         }
@@ -55,45 +47,81 @@ public class StarcoinOnChainUtils {
     }
 
     public static BigInteger getGasPrice(JSONRPC2Session jsonRpcSession) {
-        String r;
-        try {
-            r = new JsonRpcClient(jsonRpcSession).sendJsonRpc("txpool.gas_price",
-                    Collections.emptyList(), String.class);
-        } catch (JSONRPC2SessionException | JsonProcessingException e) {
-            LOG.error("Get gas price error.", e);
-            throw new RuntimeException(e);
-        }
+        String r = new JsonRpcClient(jsonRpcSession).sendJsonRpc("txpool.gas_price",
+                Collections.emptyList(), String.class);
         return new BigInteger(r);
     }
 
     public static Long getNowSeconds(JSONRPC2Session jsonRpcSession) {
-        Map<String, Object> m;
-        try {
-            m = new JsonRpcClient(jsonRpcSession).sendJsonRpc("node.info",
-                    Collections.emptyList(), new TypeReference<Map<String, Object>>() {
-                    });
-        } catch (JSONRPC2SessionException | JsonProcessingException e) {
-            LOG.error("Get node info error.", e);
-            throw new RuntimeException(e);
-        }
+        Map<String, Object> m = new JsonRpcClient(jsonRpcSession).sendJsonRpc("node.info",
+                Collections.emptyList(), new TypeReference<Map<String, Object>>() {
+                });
         return Long.valueOf(m.get("now_seconds").toString());
     }
 
     @SuppressWarnings("unchecked")
     public static BigInteger getAccountSequenceNumber(JSONRPC2Session jsonRpcSession, String accountAddress) {
-        Map<String, Object> m;
-        try {
-            m = new JsonRpcClient(jsonRpcSession).sendJsonRpc("contract.get_resource",
-                    Arrays.asList(accountAddress, "0x1::Account::Account"), new TypeReference<Map<String, Object>>() {
-                    });
-        } catch (JSONRPC2SessionException | JsonProcessingException e) {
-            LOG.error("Get account sequence number error: " + accountAddress, e);
-            throw new RuntimeException(e);
+        Map<String, Object> m = new JsonRpcClient(jsonRpcSession).sendJsonRpc("contract.get_resource",
+                Arrays.asList(accountAddress, "0x1::Account::Account"), new TypeReference<Map<String, Object>>() {
+                });
+        if (m == null) {
+            String msg = "Get null account resource by address: " + accountAddress;
+            LOG.error(msg);
+            throw new RuntimeException(msg);
         }
         List<Object> resourceItem = (List<Object>) ((List<Object>) m.get("value")).stream()
                 .filter(item -> item instanceof List && "sequence_number".equals(((List) item).get(0)))
-                .findFirst().orElseThrow(() -> new RuntimeException("Item 'sequence_number' NOT exists."));
+                .findFirst().orElseThrow(() -> new RuntimeException("Account resource item 'sequence_number' does NOT exist."));
         return new BigInteger(((Map<String, Object>) resourceItem.get(1)).get("U64").toString());
+    }
+
+    @SuppressWarnings("unchecked")
+    public static BigInteger getAccountStcBalance(JSONRPC2Session jsonRpcSession, String accountAddress) {
+        Map<String, Object> m = new JsonRpcClient(jsonRpcSession).sendJsonRpc("contract.get_resource",
+                Arrays.asList(accountAddress, "0x1::Account::Balance<0x1::STC::STC>"), new TypeReference<Map<String, Object>>() {
+                });
+        if (m == null) {
+            String msg = "Get null account resource by address: " + accountAddress;
+            LOG.error(msg);
+            throw new RuntimeException(msg);
+        }
+        List<Object> resourceItem = (List<Object>) ((List<Object>) m.get("value")).stream()
+                .filter(item -> item instanceof List && "token".equals(((List) item).get(0)))
+                .findFirst().orElseThrow(() -> new RuntimeException("Account resource item 'token' does NOT exist."));
+        Map<String, Object> tokenStruct = (Map<String, Object>) ((Map<String, Object>) resourceItem.get(1)).get("Struct");
+        List<Object> tokenStructValue = (List<Object>) ((List<Object>) tokenStruct.get("value")).stream()
+                .filter(item -> item instanceof List && "value".equals(((List) item).get(0)))
+                .findFirst().orElseThrow(() -> new RuntimeException("Token struct item 'value' does NOT exist."));
+        return new BigInteger(((Map<String, Object>) tokenStructValue.get(1)).get("U128").toString());
+/**
+ * {
+ *   "jsonrpc": "2.0",
+ *   "result": {
+ *     "abilities": 8,
+ *     "type_": "0x00000000000000000000000000000001::Account::Balance<0x00000000000000000000000000000001::STC::STC>",
+ *     "value": [
+ *       [
+ *         "token",
+ *         {
+ *           "Struct": {
+ *             "abilities": 4,
+ *             "type_": "0x00000000000000000000000000000001::Token::Token<0x00000000000000000000000000000001::STC::STC>",
+ *             "value": [
+ *               [
+ *                 "value",
+ *                 {
+ *                   "U128": "8873161509829392"
+ *                 }
+ *               ]
+ *             ]
+ *           }
+ *         }
+ *       ]
+ *     ]
+ *   },
+ *   "id": 101
+ * }
+ */
     }
 
     public static RawUserTransaction createRawUserTransaction(Integer chainId, AccountAddress accountAddress,
@@ -128,14 +156,8 @@ public class StarcoinOnChainUtils {
     }
 
     public static OnChainTransaction getOnChainTransaction(JSONRPC2Session jsonRpcSession, String transactionHash) {
-        OnChainTransaction onChainTransaction;
-        try {
-            onChainTransaction = new JsonRpcClient(jsonRpcSession)
-                    .sendJsonRpc("chain.get_transaction", Collections.singletonList(transactionHash), OnChainTransaction.class);
-        } catch (JSONRPC2SessionException | JsonProcessingException e) {
-            LOG.error("Send json rpc error.", e);
-            throw new RuntimeException(e);
-        }
+        OnChainTransaction onChainTransaction = new JsonRpcClient(jsonRpcSession)
+                .sendJsonRpc("chain.get_transaction", Collections.singletonList(transactionHash), OnChainTransaction.class);
         return onChainTransaction;
     }
 

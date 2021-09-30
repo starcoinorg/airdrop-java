@@ -6,6 +6,7 @@ import com.novi.serde.Int128;
 import com.novi.serde.SerializationError;
 import com.novi.serde.Unsigned;
 import org.starcoin.types.*;
+import org.starcoin.utils.HexUtils;
 
 import java.math.BigInteger;
 import java.util.Collections;
@@ -21,11 +22,11 @@ public class StarcoinTransactionPayloadUtils {
         script_function_builder.ty_args = Collections.singletonList(TypeUtils.parseTypeTag(tokenType));
         script_function_builder.args = java.util.Arrays.asList(
                 encode_u64_argument(airdropId),
-                encode_u8vector_argument(new Bytes(CommonUtils.hexToByteArray(root)))
+                encode_u8vector_argument(new Bytes(HexUtils.hexToByteArray(root)))
         );
         script_function_builder.function = new Identifier("revoke_airdrop");
         script_function_builder.module = new ModuleId(
-                AccountAddress.valueOf(CommonUtils.hexToByteArray(functionAddress)),
+                AccountAddress.valueOf(HexUtils.hexToByteArray(functionAddress)),
                 new Identifier("MerkleDistributorScript"));
         TransactionPayload.ScriptFunction.Builder builder = new TransactionPayload.ScriptFunction.Builder();
         builder.value = script_function_builder.build();
@@ -52,13 +53,13 @@ public class StarcoinTransactionPayloadUtils {
         script_function_builder.ty_args = Collections.singletonList(TypeUtils.parseTypeTag(tokenType));
         script_function_builder.args = java.util.Arrays.asList(
                 encode_u64_argument(airdropId),
-                encode_u8vector_argument(new Bytes(CommonUtils.hexToByteArray(root))),
+                encode_u8vector_argument(new Bytes(HexUtils.hexToByteArray(root))),
                 encode_u128_argument(amount),
                 encode_u64_argument(proofsSize)
         );
         script_function_builder.function = new Identifier("create");
         script_function_builder.module = new ModuleId(
-                AccountAddress.valueOf(CommonUtils.hexToByteArray(functionAddress)),
+                AccountAddress.valueOf(HexUtils.hexToByteArray(functionAddress)),
                 new Identifier("MerkleDistributorScript"));
         TransactionPayload.ScriptFunction.Builder builder = new TransactionPayload.ScriptFunction.Builder();
         builder.value = script_function_builder.build();

@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.starcoin.airdrop.data.model.StarcoinVoteChangedEvent;
-import org.starcoin.airdrop.utils.CommonUtils;
+import org.starcoin.utils.HexUtils;
 import org.starcoin.bean.EventFull;
 import org.starcoin.types.event.VoteChangedEvent;
 
@@ -101,11 +101,11 @@ public class ElasticSearchService {
         List<TransactionVoteChangedEvent> transactions = new ArrayList<>();
         for (SearchHit hit : searchHit) {
             EventFull event = JSON.parseObject(hit.getSourceAsString(), EventFull.class);
-            byte[] voteBytes = CommonUtils.hexToByteArray(event.getData());
+            byte[] voteBytes = HexUtils.hexToByteArray(event.getData());
             VoteChangedEvent data = VoteChangedEvent.bcsDeserialize(voteBytes);
             // byte[] proposerBytes = CommonUtils.hexToByteArray(proposerStr);
             // AccountAddress proposer = AccountAddress.bcsDeserialize(proposerBytes);
-            if (!data.proposal_id.equals(proposalId) || !CommonUtils.byteListToHexWithPrefix(data.proposer.value).equalsIgnoreCase(proposerStr)) {//!data.proposer.equals(proposer)) {
+            if (!data.proposal_id.equals(proposalId) || !HexUtils.byteListToHexWithPrefix(data.proposer.value).equalsIgnoreCase(proposerStr)) {//!data.proposer.equals(proposer)) {
                 continue;
             }
             transactions.add(new TransactionVoteChangedEvent(event, data));
@@ -127,11 +127,11 @@ public class ElasticSearchService {
         }
 
         public String getProposer() {
-            return CommonUtils.byteListToHexWithPrefix(this.voteChangedEvent.proposer.value);
+            return HexUtils.byteListToHexWithPrefix(this.voteChangedEvent.proposer.value);
         }
 
         public String getVoter() {
-            return CommonUtils.byteListToHexWithPrefix(this.voteChangedEvent.voter.value);
+            return HexUtils.byteListToHexWithPrefix(this.voteChangedEvent.voter.value);
         }
 
         public BigInteger getVoteAmount() {

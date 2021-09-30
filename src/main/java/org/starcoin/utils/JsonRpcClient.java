@@ -1,6 +1,5 @@
-package org.starcoin.airdrop.rpc;
+package org.starcoin.utils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.starcoin.jsonrpc.JSONRPC2Request;
@@ -19,33 +18,34 @@ public class JsonRpcClient {
         this.jsonRpcSession = jsonRpcSession;
     }
 
-    public <T> T sendJsonRpc(String method, List<Object> params, Class<T> resultType)
-            throws JSONRPC2SessionException, JsonProcessingException {
+    public <T> T sendJsonRpc(String method, List<Object> params, Class<T> resultType) {
         return sendJsonRpc(method, params, (resultObj) -> {
             return resultObj == null ? null
                     : getObjectMapper().convertValue(resultObj, resultType);
         });
     }
 
-    public Object sendJsonRpc(String method, List<Object> params)
-            throws JSONRPC2SessionException, JsonProcessingException {
+    public Object sendJsonRpc(String method, List<Object> params) {
         return sendJsonRpc(method, params, (resultObj) -> {
             return resultObj;
         });
     }
 
-    public <T> T sendJsonRpc(String method, List<Object> params, TypeReference<T> resultType)
-            throws JSONRPC2SessionException, JsonProcessingException {
+    public <T> T sendJsonRpc(String method, List<Object> params, TypeReference<T> resultType) {
         return sendJsonRpc(method, params, (resultObj) -> {
             return resultObj == null ? null
                     : getObjectMapper().convertValue(resultObj, resultType);
         });
     }
 
-    private <T> T sendJsonRpc(String method, List<Object> params, Function<Object, T> readResult)
-            throws JSONRPC2SessionException {
+    private <T> T sendJsonRpc(String method, List<Object> params, Function<Object, T> readResult) {
         JSONRPC2Request request = new JSONRPC2Request(method, params, System.currentTimeMillis());
-        JSONRPC2Response response = jsonRpcSession.send(request);
+        JSONRPC2Response response = null;
+        try {
+            response = jsonRpcSession.send(request);
+        } catch (JSONRPC2SessionException e) {
+            throw new RuntimeException("JSON RPC send error.", e);
+        }
         if (response.indicatesSuccess()) {
             Object result = response.getResult();
             //if (result != null) {
@@ -66,8 +66,9 @@ public class JsonRpcClient {
          *   "message": "Transaction error (Call txn err: Transaction execution error (Execution error: status SEQUENCE_NUMBER_TOO_OLD of type Validation)..)"
          * }
          */
-        // catch SEQUENCE_NUMBER_TOO_OLD error???
-        throw new RuntimeException("JSON RPC response error: " + response.getError());
+        //todo catch SEQUENCE_NUMBER_TOO_OLD error???
+        String msg = "JSON RPC error. response error: '" + response.getError() + "'. Request: " + request;
+        throw new RuntimeException(msg);
     }
 
     private ObjectMapper getObjectMapper() {

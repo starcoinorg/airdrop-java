@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.starcoin.airdrop.utils.StarcoinOnChainUtils.*;
+import static org.starcoin.utils.StarcoinOnChainUtils.*;
 
 @Service
 public class AirdropMerkleDistributionService {

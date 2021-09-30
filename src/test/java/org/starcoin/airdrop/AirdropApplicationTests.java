@@ -11,8 +11,12 @@ import org.starcoin.airdrop.data.repo.AirdropRecordRepository;
 import org.starcoin.airdrop.data.repo.StarcoinEventRepository;
 import org.starcoin.airdrop.data.repo.VoteRewardRepository;
 import org.starcoin.airdrop.service.*;
+import org.starcoin.jsonrpc.client.JSONRPC2Session;
+import org.starcoin.utils.StarcoinOnChainUtils;
 
 import java.math.BigInteger;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
@@ -82,6 +86,15 @@ class AirdropApplicationTests {
 
     @Test
     void contextLoads() {
+        try {
+            JSONRPC2Session jsonrpc2Session = new JSONRPC2Session(new URL("https://barnard-seed.starcoin.org"));
+            BigInteger stcBalance = StarcoinOnChainUtils.getAccountStcBalance(jsonrpc2Session, "0x0000000000000000000000000a550c18");
+            System.out.println(stcBalance);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        if (true) return;
+
         airdropMerkleDistributionService.revokeOnChain(15L);
         if (true) return;
 
