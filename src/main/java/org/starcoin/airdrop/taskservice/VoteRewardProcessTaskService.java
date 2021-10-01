@@ -25,12 +25,16 @@ public class VoteRewardProcessTaskService {
     public void task() {
         List<VoteRewardProcess> voteRewardProcesses = voteRewardProcessRepository.findByStatusEquals(VoteRewardProcess.STATUS_CREATED);
         for (VoteRewardProcess v : voteRewardProcesses) {
-            // start processing...
             if (LOG.isDebugEnabled()) {
-                LOG.debug("Start processing vote rewards... ProcessId: " + v.getProcessId());
+                LOG.debug("Start processing vote rewards... ProcessId: " + v.getProcessId()); // start processing...
             }
-            // todo update process status to error if exception caught??
-            voteRewardProcessService.process(v);
+            try {
+                voteRewardProcessService.process(v);
+            } catch (RuntimeException runtimeException) {
+                voteRewardProcessService.updateVoteRewardProcessStatusError(v.getProcessId(),
+                        runtimeException.getMessage());
+                break;
+            }
             // ------------------------------
             if (LOG.isDebugEnabled()) {
                 LOG.debug("End of processing vote rewards. ProcessId: " + v.getProcessId());
