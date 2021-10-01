@@ -29,6 +29,7 @@ public class VoteRewardProcessTaskService {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Start processing vote rewards... ProcessId: " + v.getProcessId());
             }
+            // todo update process status to error if exception caught??
             voteRewardProcessService.process(v);
             // ------------------------------
             if (LOG.isDebugEnabled()) {

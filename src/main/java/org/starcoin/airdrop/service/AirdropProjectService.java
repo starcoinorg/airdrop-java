@@ -17,14 +17,14 @@ public class AirdropProjectService {
     /**
      * Add airdrop project.
      *
-     * @param chainId   chain Id.
-     * @param name      project name(process name).
-     * @param startTime vote started at.
-     * @param endTime   vote ended at.
+     * @param chainId        chain Id.
+     * @param name           project name(process name).
+     * @param claimStartTime claim reward started at.
+     * @param claimEndTime   claim reward ended at.
      * @return Airdrop Id.(project Id.)
      */
     @Transactional
-    public Long addProject(Integer chainId, String name, Date startTime, Date endTime) {
+    public Long addProject(Integer chainId, String name, Date claimStartTime, Date claimEndTime) {
         AirdropProject existedPrj = airdropProjectRepository.findFirstByName(name);
         if (existedPrj != null) {
             throw new RuntimeException("Project name existed.");
@@ -35,8 +35,8 @@ public class AirdropProjectService {
         // (null,'投票#4奖励-Starcoin Move 合约标准库升级到 V6 版本','0x1::STC::STC', 'STC', 9, '2021-09-26 23:00:00','2021-09-20 23:59:59')
         AirdropProject p = new AirdropProject();
         p.setName(name);
-        p.setStartAt(startTime);
-        p.setEndAt(endTime);
+        p.setStartAt(claimStartTime);
+        p.setEndAt(claimEndTime);
         p.setNetworkVersion(chainId);
         //p.setToken("0x1::STC::STC"); // default token type.
         p.setCreateAt(new Date());

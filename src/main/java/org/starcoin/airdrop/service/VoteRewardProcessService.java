@@ -19,6 +19,7 @@ import java.util.List;
 @Service
 public class VoteRewardProcessService {
     public static final Long NO_AIRDROP_ID = -1L;
+    public static final long CLAIM_REWARD_TIME_LIMIT_MILLISECONDS = 14 * 24L * 60 * 60 * 1000;
 
     private static final Logger LOG = LoggerFactory.getLogger(VoteRewardProcessService.class);
 
@@ -88,8 +89,10 @@ public class VoteRewardProcessService {
         voteRewardRepository.deactiveVoteRewardsByProposalId(v.getProposalId());
         processVoteRewards(v, events);
         boolean onChain = v.getOnChainDisabled() == null || !v.getOnChainDisabled(); // default is on-chain.
+        Date claimRewardStartTime = new Date(v.getVoteEndTimestamp());//new Date(v.getVoteStartTimestamp());
+        Date claimRewardEndTime = new Date(v.getVoteEndTimestamp() + CLAIM_REWARD_TIME_LIMIT_MILLISECONDS);
         Long airdropId = onChain
-                ? airdropProjectService.addProject(v.getChainId(), v.getName(), new Date(v.getVoteStartTimestamp()), new Date(v.getVoteEndTimestamp()))
+                ? airdropProjectService.addProject(v.getChainId(), v.getName(), claimRewardStartTime, claimRewardEndTime)
                 : NO_AIRDROP_ID;
         ApiMerkleTree apiMerkleTree;
         if (onChain) {
@@ -117,6 +120,15 @@ public class VoteRewardProcessService {
             voteRewardService.adjustRewardsUnderLimit(v.getProposalId(), totalRewardAmount, TOTAL_REWARD_AMOUNT_LIMIT);
             LOG.info("Adjusted rewards under total amount limit: " + TOTAL_REWARD_AMOUNT_LIMIT);
         }
+    }
+
+    public void updateVoteRewardProcessStatusError(Long processId, String message) {
+        VoteRewardProcess v = voteRewardProcessRepository.findById(processId).orElseThrow(() -> new RuntimeException("Cannot find by process by Id: " + processId));
+        v.setStatusError(message);
+        v.setUpdatedBy("admin");
+        v.setUpdatedAt(System.currentTimeMillis());
+        voteRewardProcessRepository.save(v);
+        voteRewardProcessRepository.flush();
     }
 
     private void updateVoteRewardProcessingMessage(Long processId, String message) {

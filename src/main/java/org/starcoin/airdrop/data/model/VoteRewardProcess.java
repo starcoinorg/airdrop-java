@@ -5,6 +5,8 @@ import javax.persistence.*;
 @Entity
 @Table(uniqueConstraints = {@UniqueConstraint(name = "UniqueName", columnNames = {"name"})})
 public class VoteRewardProcess {
+    public static final int MAX_MESSAGE_LENGTH = 255;
+
     public static final int CHAIN_ID_MAIN = 1;//1: 'main'
     public static final int CHAIN_ID_PROXIMA = 2;//2: 'proxima'
     public static final int CHAIN_ID_BARNARD = 251;//251: 'barnard'
@@ -13,6 +15,7 @@ public class VoteRewardProcess {
     public static final String STATUS_CREATED = "CREATED";
     public static final String STATUS_PROCESSING = "PROCESSING";
     public static final String STATUS_PROCESSED = "PROCESSED";
+    public static final String STATUS_ERROR = "ERROR";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -182,8 +185,7 @@ public class VoteRewardProcess {
     }
 
     public boolean isProcessing() {
-        return STATUS_PROCESSING.equalsIgnoreCase(this.getStatus())
-                || STATUS_CREATED.equalsIgnoreCase(this.getStatus());
+        return STATUS_PROCESSING.equalsIgnoreCase(this.getStatus());//|| STATUS_CREATED.equalsIgnoreCase(this.getStatus());
     }
 
     public String getDescription() {
@@ -199,7 +201,7 @@ public class VoteRewardProcess {
     }
 
     public void setMessage(String message) {
-        this.message = message;
+        this.message = message.length() > MAX_MESSAGE_LENGTH ? message.substring(0, MAX_MESSAGE_LENGTH) : message;
     }
 
     public String getAirdropJson() {
@@ -242,4 +244,10 @@ public class VoteRewardProcess {
         this.revokeOnChainTransactionHash = revokeOnChainTransactionHash;
     }
 
+    public void setStatusError(String message) {
+        this.setStatus(STATUS_ERROR);
+        this.setMessage(this.getMessage() != null && !this.getMessage().isEmpty()
+                ? this.getMessage() + " " + message
+                : message);
+    }
 }

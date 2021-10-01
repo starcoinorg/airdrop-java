@@ -17,9 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.starcoin.airdrop.data.model.StarcoinVoteChangedEvent;
-import org.starcoin.utils.HexUtils;
 import org.starcoin.bean.EventFull;
 import org.starcoin.types.event.VoteChangedEvent;
+import org.starcoin.utils.HexUtils;
 
 import java.io.IOException;
 import java.math.BigInteger;

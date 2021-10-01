@@ -2,6 +2,8 @@ package org.starcoin.airdrop.api.controller;
 
 import com.opencsv.CSVWriter;
 import io.swagger.annotations.Api;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 import org.starcoin.airdrop.data.model.VoteRewardProcess;
@@ -22,6 +24,9 @@ import java.util.Map;
 @RestController
 @RequestMapping("v1")
 public class AirdropController {
+    private static final Logger LOG = LoggerFactory.getLogger(AirdropController.class);
+
+    private final int MAX_NAME_LENGTH = 50;
 
     @Resource
     private VoteRewardService voteRewardService;
@@ -62,8 +67,11 @@ public class AirdropController {
 
     @PostMapping("voteRewardProcesses")
     public VoteRewardProcess postVoteRewardProcess(@RequestBody VoteRewardProcessVO voteRewardProcess) {
+        if (voteRewardProcess.getName() == null || voteRewardProcess.getName().isEmpty())
+            throw new IllegalArgumentException("Process name is null.");
+        if (voteRewardProcess.getName().length() > MAX_NAME_LENGTH)
+            throw new IllegalArgumentException("Name is too long.");
         if (voteRewardProcess.getChainId() == null) throw new IllegalArgumentException("Chain Id is null.");
-        if (voteRewardProcess.getName() == null) throw new IllegalArgumentException("Process name is null.");
         if (voteRewardProcess.getVoteStartTimestamp() == null)
             throw new IllegalArgumentException("Start time is null.");
         if (voteRewardProcess.getVoteEndTimestamp() == null)
@@ -81,8 +89,9 @@ public class AirdropController {
     ) throws IOException {
         VoteRewardProcess voteRewardProcess = voteRewardProcessService.findByIdOrElseThrow(processId);
         if (voteRewardProcess.isProcessing()) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return;
+            //response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            //return;
+            LOG.info("Process is processing: " + processId);
         }
         Long proposalId = voteRewardProcess.getProposalId();
 
@@ -102,8 +111,9 @@ public class AirdropController {
     ) throws IOException {
         VoteRewardProcess voteRewardProcess = voteRewardProcessService.findByIdOrElseThrow(processId);
         if (voteRewardProcess.isProcessing()) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return;
+            //response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            //return;
+            LOG.info("Process is processing: " + processId);
         }
         Long proposalId = voteRewardProcess.getProposalId();
 
