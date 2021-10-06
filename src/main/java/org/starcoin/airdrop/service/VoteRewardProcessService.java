@@ -16,6 +16,8 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
+import static org.starcoin.airdrop.data.model.VoteRewardProcess.MAX_NAME_LENGTH;
+
 @Service
 public class VoteRewardProcessService {
     public static final Long NO_AIRDROP_ID = -1L;
@@ -55,6 +57,8 @@ public class VoteRewardProcessService {
     }
 
     public VoteRewardProcess createVoteRewardProcess(VoteRewardProcess src) {
+        if (src.getName().length() > MAX_NAME_LENGTH)
+            throw new IllegalArgumentException("Name is too long.");
         VoteRewardProcess v = new VoteRewardProcess();
         BeanUtils.copyProperties(src, v);
         v.setProcessId(null);

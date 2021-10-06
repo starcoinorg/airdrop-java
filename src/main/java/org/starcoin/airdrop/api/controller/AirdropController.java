@@ -26,8 +26,6 @@ import java.util.Map;
 public class AirdropController {
     private static final Logger LOG = LoggerFactory.getLogger(AirdropController.class);
 
-    private final int MAX_NAME_LENGTH = 50;
-
     @Resource
     private VoteRewardService voteRewardService;
 
@@ -69,8 +67,6 @@ public class AirdropController {
     public VoteRewardProcess postVoteRewardProcess(@RequestBody VoteRewardProcessVO voteRewardProcess) {
         if (voteRewardProcess.getName() == null || voteRewardProcess.getName().isEmpty())
             throw new IllegalArgumentException("Process name is null.");
-        if (voteRewardProcess.getName().length() > MAX_NAME_LENGTH)
-            throw new IllegalArgumentException("Name is too long.");
         if (voteRewardProcess.getChainId() == null) throw new IllegalArgumentException("Chain Id is null.");
         if (voteRewardProcess.getVoteStartTimestamp() == null)
             throw new IllegalArgumentException("Start time is null.");

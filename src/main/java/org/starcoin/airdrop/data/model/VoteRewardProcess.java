@@ -5,6 +5,8 @@ import javax.persistence.*;
 @Entity
 @Table(uniqueConstraints = {@UniqueConstraint(name = "UniqueName", columnNames = {"name"})})
 public class VoteRewardProcess {
+
+    public static final int MAX_NAME_LENGTH = 50;
     public static final int MAX_MESSAGE_LENGTH = 255;
 
     public static final int CHAIN_ID_MAIN = 1;//1: 'main'
@@ -201,7 +203,8 @@ public class VoteRewardProcess {
     }
 
     public void setMessage(String message) {
-        this.message = message.length() > MAX_MESSAGE_LENGTH ? message.substring(0, MAX_MESSAGE_LENGTH) : message;
+        this.message = message == null ? null
+                : message.length() > MAX_MESSAGE_LENGTH ? message.substring(0, MAX_MESSAGE_LENGTH) : message;
     }
 
     public String getAirdropJson() {
