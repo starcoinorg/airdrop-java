@@ -38,10 +38,12 @@ spring:
 #    serialization:
 #      write_dates_as_timestamps: false
 
+
 jasypt:
   encryptor:
     bean: encryptorBean
     password: ${STARCOIN_ES_PWD}
+
 
 elasticsearch:
   host: ${STARCOIN_ES_URL}
@@ -53,9 +55,11 @@ elasticsearch:
   connectionRequestTimeout: 2000
   transaction-event-index-prefix: ${STARCOIN_ES_TXN_EVENT_IDX_PREFIX}
 
+
 airdrop:
   vote-reward-process-task-service:
     fixed-delay: 10000
+
 
 starcoin:
   # seeds: ${STARCOIN_SEEDS}
@@ -66,3 +70,26 @@ starcoin:
     token-type: "0x00000000000000000000000000000001::STC::STC"
     function-address: "0xb987F1aB0D7879b2aB421b98f96eFb44"
     owner-private-key: ${STARCOIN_AIRDROP_OWNER_PK}
+  get-last-proposal-list-url: https://poll-api.starcoin.org/v1/polls/page/main?page=1
+  vote-reward-name-prefix-format: "投票#%1$s奖励-"
+
+
+ok:
+  http:
+    connect-timeout: 10
+    max-idle-connections: 60
+    read-timeout: 10
+    write-timeout: 10
+    keep-alive-duration: 600
+
+
+springfox:
+  documentation:
+    swaggerUi:
+      baseUrl: /airdrop-api-doc
+    openApi:
+      v3:
+        path: /airdrop-api-doc/v3/api-docs
+    swagger:
+      v2:
+        path: /airdrop-api-doc/v2/api-docs

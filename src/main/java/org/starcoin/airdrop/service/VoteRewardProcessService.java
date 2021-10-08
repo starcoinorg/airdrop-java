@@ -52,6 +52,9 @@ public class VoteRewardProcessService {
     @Autowired
     private AirdropMerkleDistributionService airdropMerkleDistributionService;
 
+    @Autowired
+    private StarcoinProposalService starcoinProposalService;
+
     public VoteRewardProcess getVoteRewardProcess(Long processId) {
         return voteRewardProcessRepository.findById(processId).orElse(null);
     }
@@ -159,6 +162,22 @@ public class VoteRewardProcessService {
         v.setUpdatedAt(System.currentTimeMillis());
         voteRewardProcessRepository.save(v);
         voteRewardProcessRepository.flush();
+    }
+
+    public VoteRewardProcess createVoteRewardProcessByProposalId(String proposalId, boolean onChainDisabled) {
+        if (!onChainDisabled) {
+            BigInteger maxOnChainProposalId = voteRewardProcessRepository.getMaxOnChainProposalId();
+            //System.out.println(maxOnChainProposalId);
+            if (maxOnChainProposalId != null && maxOnChainProposalId.compareTo(new BigInteger(proposalId)) >= 0) {
+                String msg = "Proposal #" + proposalId + " already has process.";
+                LOG.error(msg);
+                throw new IllegalArgumentException(msg);
+            }
+        }
+        StarcoinProposalService.Proposal proposal = starcoinProposalService.getProposalByIdOnChain(proposalId);
+        VoteRewardProcess voteRewardProcess = starcoinProposalService.createVoteRewardProcess(proposal, onChainDisabled);
+        //System.out.println(voteRewardProcess);
+        return createVoteRewardProcess(voteRewardProcess);
     }
 
 }

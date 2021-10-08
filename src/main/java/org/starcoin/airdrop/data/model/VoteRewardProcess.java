@@ -3,8 +3,13 @@ package org.starcoin.airdrop.data.model;
 import javax.persistence.*;
 
 @Entity
-@Table(uniqueConstraints = {@UniqueConstraint(name = "UniqueName", columnNames = {"name"})})
+@Table(uniqueConstraints = {
+        @UniqueConstraint(name = "UniqueName", columnNames = {"name"}),
+        @UniqueConstraint(name = "UniqueProposalAndSeqNum", columnNames = {"proposal_id", "proposal_process_seq_number"})
+})
 public class VoteRewardProcess {
+
+    public static final Long DEFAULT_PROPOSAL_PROCESS_SEQ_NUMBER = 0L;
 
     public static final int MAX_NAME_LENGTH = 50;
     public static final int MAX_MESSAGE_LENGTH = 255;
@@ -25,6 +30,9 @@ public class VoteRewardProcess {
 
     @Column(name = "proposal_id", nullable = false)
     private Long proposalId;
+
+    @Column(name = "proposal_process_seq_number")
+    private Long proposalProcessSeqNumber;
 
     @Column(length = 34, nullable = false)
     private String proposer;
@@ -252,5 +260,39 @@ public class VoteRewardProcess {
         this.setMessage(this.getMessage() != null && !this.getMessage().isEmpty()
                 ? this.getMessage() + " " + message
                 : message);
+    }
+
+    public Long getProposalProcessSeqNumber() {
+        return proposalProcessSeqNumber;
+    }
+
+    public void setProposalProcessSeqNumber(Long proposalProcessSeqNumber) {
+        this.proposalProcessSeqNumber = proposalProcessSeqNumber;
+    }
+
+    @Override
+    public String toString() {
+        return "VoteRewardProcess{" +
+                "processId=" + processId +
+                ", proposalId=" + proposalId +
+                ", proposalProcessSeqNumber=" + proposalProcessSeqNumber +
+                ", proposer='" + proposer + '\'' +
+                ", voteStartTimestamp=" + voteStartTimestamp +
+                ", voteEndTimestamp=" + voteEndTimestamp +
+                ", status='" + status + '\'' +
+                ", createdBy='" + createdBy + '\'' +
+                ", updatedBy='" + updatedBy + '\'' +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", message='" + message + '\'' +
+                ", chainId=" + chainId +
+                ", airdropJson='" + airdropJson + '\'' +
+                ", onChainTransactionHash='" + onChainTransactionHash + '\'' +
+                ", revokeOnChainTransactionHash='" + revokeOnChainTransactionHash + '\'' +
+                ", onChainDisabled=" + onChainDisabled +
+                ", version=" + version +
+                '}';
     }
 }

@@ -22,7 +22,7 @@ import java.util.Map;
 
 @Api(tags = {"Airdrop Java RESTful API"})
 @RestController
-@RequestMapping("v1")
+@RequestMapping("v1/airdrops")
 public class AirdropController {
     private static final Logger LOG = LoggerFactory.getLogger(AirdropController.class);
 
@@ -63,6 +63,12 @@ public class AirdropController {
         return airdropMerkleDistributionService.revokeOnChain(processId);
     }
 
+    @PostMapping("createVoteRewardProcess")
+    public VoteRewardProcess createVoteRewardProcess(@RequestParam("proposalId") String proposalId,
+                                                     @RequestParam(value = "onChainDisabled", required = false) Boolean onChainDisabled) {
+        return voteRewardProcessService.createVoteRewardProcessByProposalId(proposalId, onChainDisabled == null || onChainDisabled);
+    }
+
     @PostMapping("voteRewardProcesses")
     public VoteRewardProcess postVoteRewardProcess(@RequestBody VoteRewardProcessVO voteRewardProcess) {
         if (voteRewardProcess.getName() == null || voteRewardProcess.getName().isEmpty())
@@ -72,6 +78,13 @@ public class AirdropController {
             throw new IllegalArgumentException("Start time is null.");
         if (voteRewardProcess.getVoteEndTimestamp() == null)
             throw new IllegalArgumentException("End time is null.");
+        if (voteRewardProcess.getOnChainDisabled() == null) {
+            voteRewardProcess.setOnChainDisabled(true);// default DISABLE on-chain operations!!!
+        }
+        long proposalProcessSeqNumber = voteRewardProcess.getOnChainDisabled()
+                ? System.currentTimeMillis()
+                : VoteRewardProcess.DEFAULT_PROPOSAL_PROCESS_SEQ_NUMBER;
+        voteRewardProcess.setProposalProcessSeqNumber(proposalProcessSeqNumber);
         return voteRewardProcessService.createVoteRewardProcess(voteRewardProcess);
     }
 

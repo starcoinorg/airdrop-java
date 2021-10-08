@@ -6,10 +6,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.starcoin.airdrop.data.model.AirdropProject;
 import org.starcoin.airdrop.data.model.AirdropRecord;
 import org.starcoin.airdrop.data.model.StarcoinVoteChangedEvent;
-import org.starcoin.airdrop.data.repo.AirdropProjectRepository;
-import org.starcoin.airdrop.data.repo.AirdropRecordRepository;
-import org.starcoin.airdrop.data.repo.StarcoinEventRepository;
-import org.starcoin.airdrop.data.repo.VoteRewardRepository;
+import org.starcoin.airdrop.data.model.VoteRewardProcess;
+import org.starcoin.airdrop.data.repo.*;
 import org.starcoin.airdrop.service.*;
 import org.starcoin.jsonrpc.client.JSONRPC2Session;
 import org.starcoin.utils.StarcoinOnChainUtils;
@@ -84,8 +82,21 @@ class AirdropApplicationTests {
     //}
     //
 
+    @Autowired
+    StarcoinProposalService starcoinProposalService;
+
+    @Autowired
+    VoteRewardProcessRepository voteRewardProcessRepository;
+
     @Test
     void contextLoads() {
+        BigInteger maxOnChainProposalId = voteRewardProcessRepository.getMaxOnChainProposalId();
+        System.out.println(maxOnChainProposalId);
+        StarcoinProposalService.Proposal proposal = starcoinProposalService.getProposalByIdOnChain("6");
+        VoteRewardProcess voteRewardProcess = starcoinProposalService.createVoteRewardProcess(proposal, true);
+        System.out.println(voteRewardProcess);
+        if (true) return;
+
         try {
             JSONRPC2Session jsonrpc2Session = new JSONRPC2Session(new URL("https://barnard-seed.starcoin.org"));
             BigInteger stcBalance = StarcoinOnChainUtils.getAccountStcBalance(jsonrpc2Session, "0x0000000000000000000000000a550c18");
