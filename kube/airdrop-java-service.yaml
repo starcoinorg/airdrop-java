@@ -12,6 +12,4 @@ spec:
     targetPort: 8787
   selector:
     app: airdrop-java
-  type: LoadBalancer
-status:
-  loadBalancer: {}
+  type: ClusterIP
