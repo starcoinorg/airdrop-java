@@ -45,7 +45,7 @@ curl -H "Content-Type: application/json" -X POST \
 
 如果创建流程成功，在返回的结果中存在流程 Id（`processId`）。
 
-#### 通过提案 Id 创建奖励处理流程
+#### 通过提案 Id 创建投票奖励处理流程
 
 一个更简单的创建奖励处理流程的方法，通过 POST 提案 Id 创建处理流程：
 
@@ -58,6 +58,10 @@ curl -H "Content-Type: application/json" -X POST \
 
 * proposalId：提案 Id。注意：这里的提案 Id 指的是链上的 Id（`idOnChain`）。
 * onChainDisabled：设置为 true 则处理流程不包括提交空投数据上链的操作。如果不填写，默认值为 true。
+
+注意：对于一个 proposalId，只允许创建一个执行上链操作（即 `onChainDisabled=false`）的处理流程，但可以创建多个不执行上链操作（`onChainDisabled=true`）的处理流程。
+
+对于一个 proposalId，可以先创建不执行上链操作的处理流程，导出 CSV 和 JSON 文件，查看生成的奖励信息，确认无误后再创建会执行上链操作的处理流程（这样的流程只能创建一次，尝试重复创建会失败）。
 
 ### 查看处理流程
 
