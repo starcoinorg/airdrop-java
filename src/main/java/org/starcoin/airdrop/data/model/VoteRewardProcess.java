@@ -267,6 +267,13 @@ public class VoteRewardProcess {
                 : message);
     }
 
+    public void reset() {
+        if (!STATUS_ERROR.equalsIgnoreCase(this.status)) {
+            throw new RuntimeException("Process current status is NOT 'ERROR'.");
+        }
+        this.setStatus(STATUS_CREATED);
+    }
+
     public Long getProposalProcessSeqNumber() {
         return proposalProcessSeqNumber;
     }
@@ -300,4 +307,5 @@ public class VoteRewardProcess {
                 ", version=" + version +
                 '}';
     }
+
 }

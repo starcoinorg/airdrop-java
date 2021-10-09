@@ -114,6 +114,21 @@ curl -H "Content-Type: application/json" -X POST \
 
 * processId：处理流程 Id。
 
+### 重置处理流程
+
+重置出错的处理流程，使其可以被重新处理。
+
+```shell
+curl -H "Content-Type: application/json" -X POST \
+-d '{}' "http://localhost:8787/v1/airdrops/resetVoteRewardProcess?processId=25"
+```
+
+查询参数说明：
+
+* processId：处理流程 Id。
+
+注意：该接口需要在排查出之前流程处理出错的原因（比如链上账户余额不足），解决问题（比如给链上账户充值）之后再调用。
+
 ### 更多 API 描述
 
 见 Swagger UI：

@@ -190,4 +190,14 @@ public class VoteRewardProcessService {
         return createVoteRewardProcess(voteRewardProcess);
     }
 
+    /**
+     * Reset process status to 'CREATED', so it can be reprocessed.
+     */
+    public void resetVoteRewardProcess(Long processId) {
+        VoteRewardProcess v = voteRewardProcessRepository.findById(processId).orElseThrow(() -> new RuntimeException("Cannot find by process by Id: " + processId));
+        v.reset();
+        v.setUpdatedBy("admin");
+        v.setUpdatedAt(System.currentTimeMillis());
+        voteRewardProcessRepository.save(v);
+    }
 }
