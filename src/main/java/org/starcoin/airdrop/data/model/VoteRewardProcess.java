@@ -212,7 +212,7 @@ public class VoteRewardProcess {
 
     public void setMessage(String message) {
         this.message = message == null ? null
-                : message.length() > MAX_MESSAGE_LENGTH ? message.substring(0, MAX_MESSAGE_LENGTH) : message;
+                : (message.length() > MAX_MESSAGE_LENGTH ? message.substring(0, MAX_MESSAGE_LENGTH - 3) + "..." : message);
     }
 
     public String getAirdropJson() {
@@ -255,10 +255,15 @@ public class VoteRewardProcess {
         this.revokeOnChainTransactionHash = revokeOnChainTransactionHash;
     }
 
+    /**
+     * Set status to error and message.
+     *
+     * @param message error message.
+     */
     public void setStatusError(String message) {
         this.setStatus(STATUS_ERROR);
         this.setMessage(this.getMessage() != null && !this.getMessage().isEmpty()
-                ? this.getMessage() + " " + message
+                ? this.getMessage() + " " + message // if this.message is not null, append it.
                 : message);
     }
 
