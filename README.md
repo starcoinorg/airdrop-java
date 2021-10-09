@@ -106,7 +106,7 @@ curl -H "Content-Type: application/json" -X POST \
 也可以通过 process Id 来 revoke 链上的空投记录。例子（假设 process Id 为 8）：
 
 ```shell
-curl -H "Content-Type: application/json" -X POST \
+curl -H "Content-Type: application/json" -i -X POST \
 "http://localhost:8787/v1/airdrops/revokeOnChainByProcessId?processId=8"
 ```
 
@@ -119,7 +119,7 @@ curl -H "Content-Type: application/json" -X POST \
 重置出错的处理流程，使其可以被重新处理。
 
 ```shell
-curl -H "Content-Type: application/json" -X POST \
+curl -H "Content-Type: application/json" -i -X POST \
 -d '{}' "http://localhost:8787/v1/airdrops/resetVoteRewardProcess?processId=25"
 ```
 

@@ -38,6 +38,9 @@ spring:
 #    serialization:
 #      write_dates_as_timestamps: false
 
+  security:
+    htpasswd: ${SPRING_SECURITY_HTPASSWD}
+
 
 jasypt:
   encryptor:

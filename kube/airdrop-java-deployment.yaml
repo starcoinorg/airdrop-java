@@ -22,6 +22,11 @@ spec:
         env:
         - name: spring_profiles_active
           value: prod
+        - name: SPRING_SECURITY_HTPASSWD
+          valueFrom:
+            secretKeyRef:
+              name: http-basic-auth
+              key: auth
         - name: STARCOIN_MYSQL_URL
           value: "jdbc:mysql://starcoin-db-2.c0bz9kehdvnb.ap-northeast-1.rds.amazonaws.com:3306/airdrop?useUnicode=true&characterEncoding=utf-8&serverTimezone=UTC"
         - name: STARCOIN_MYSQL_USER
