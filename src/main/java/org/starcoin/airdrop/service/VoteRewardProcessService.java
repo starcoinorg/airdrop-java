@@ -140,7 +140,7 @@ public class VoteRewardProcessService {
     }
 
     public void updateVoteRewardProcessStatusError(Long processId, String message) {
-        VoteRewardProcess v = voteRewardProcessRepository.findById(processId).orElseThrow(() -> new RuntimeException("Cannot find by process by Id: " + processId));
+        VoteRewardProcess v = voteRewardProcessRepository.findById(processId).orElseThrow(() -> new RuntimeException("Cannot find process by Id: " + processId));
         v.setStatusError(message);
         v.setUpdatedBy("admin");
         v.setUpdatedAt(System.currentTimeMillis());
@@ -149,7 +149,7 @@ public class VoteRewardProcessService {
     }
 
     private void updateVoteRewardProcessingMessage(Long processId, String message) {
-        VoteRewardProcess v = voteRewardProcessRepository.findById(processId).orElseThrow(() -> new RuntimeException("Cannot find by process by Id: " + processId));
+        VoteRewardProcess v = voteRewardProcessRepository.findById(processId).orElseThrow(() -> new RuntimeException("Cannot find process by Id: " + processId));
         v.setMessage(message);
         v.setUpdatedBy("admin");
         v.setUpdatedAt(System.currentTimeMillis());
@@ -158,7 +158,7 @@ public class VoteRewardProcessService {
     }
 
     private void updateVoteRewardProcessStatusProcessed(Long processId) {
-        VoteRewardProcess v = voteRewardProcessRepository.findById(processId).orElseThrow(() -> new RuntimeException("Cannot find by process by Id: " + processId));
+        VoteRewardProcess v = voteRewardProcessRepository.findById(processId).orElseThrow(() -> new RuntimeException("Cannot find process by Id: " + processId));
         v.processed();
         v.setUpdatedBy("admin");
         v.setUpdatedAt(System.currentTimeMillis());
@@ -194,7 +194,7 @@ public class VoteRewardProcessService {
      * Reset process status to 'CREATED', so it can be reprocessed.
      */
     public void resetVoteRewardProcess(Long processId) {
-        VoteRewardProcess v = voteRewardProcessRepository.findById(processId).orElseThrow(() -> new RuntimeException("Cannot find by process by Id: " + processId));
+        VoteRewardProcess v = voteRewardProcessRepository.findById(processId).orElseThrow(() -> new RuntimeException("Cannot find process by Id: " + processId));
         v.reset();
         v.setUpdatedBy("admin");
         v.setUpdatedAt(System.currentTimeMillis());
