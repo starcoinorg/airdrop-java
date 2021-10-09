@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.starcoin.airdrop.config.StarcoinChainConfig;
 import org.starcoin.airdrop.data.model.VoteRewardProcess;
 import org.starcoin.airdrop.data.repo.VoteRewardProcessRepository;
 import org.starcoin.airdrop.data.repo.VoteRewardRepository;
@@ -57,8 +58,8 @@ public class AirdropMerkleDistributionService {
     @Autowired
     private VoteRewardProcessRepository voteRewardProcessRepository;
 
-    @Value("${starcoin.chain-id}")
-    private Integer chainId;
+    @Autowired
+    private StarcoinChainConfig.ChainSettings chainSettings;
 
     @Value("${starcoin.airdrop.function-address}")
     private String airdropFunctionAddress;
@@ -140,7 +141,7 @@ public class AirdropMerkleDistributionService {
 
     private String createTransactionAndSignAndSubmit(TransactionPayload transactionPayload) {
         RawUserTransaction rawUserTransaction = createRawUserTransaction(
-                this.chainId,
+                this.chainSettings.getChainId(),
                 AccountAddressUtils.create(this.airdropOwnerAddress),
                 getAccountSequenceNumber(this.jsonRpcSession, this.airdropOwnerAddress),
                 transactionPayload,
@@ -164,8 +165,8 @@ public class AirdropMerkleDistributionService {
 
     public ApiMerkleTree createAirdropMerkleTreeAndSave(Long processId, Long airdropId) {
         VoteRewardProcess process = voteRewardProcessRepository.findById(processId).orElseThrow(() -> new RuntimeException("Cannot find process by Id: " + processId));
-        if (!chainId.equals(process.getChainId())) {
-            throw new RuntimeException("Wrong chain Id. Must be: " + chainId);
+        if (!this.chainSettings.getChainId().equals(process.getChainId())) {
+            throw new RuntimeException("Wrong chain Id. Must be: " + this.chainSettings.getChainId());
         }
         Long proposalId = process.getProposalId();
         //        ChainService chainService = new ChainService(ChainAccount.builder()
@@ -220,7 +221,7 @@ public class AirdropMerkleDistributionService {
         apiMerkleTree.setTokenType(airdropTokenType);
         apiMerkleTree.setOwnerAddress(airdropOwnerAddress);
 
-        apiMerkleTree.setChainId(chainId);
+        apiMerkleTree.setChainId(this.chainSettings.getChainId());
         return apiMerkleTree;
     }
 

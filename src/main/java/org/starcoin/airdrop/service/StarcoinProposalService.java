@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.starcoin.airdrop.config.StarcoinChainConfig;
 import org.starcoin.airdrop.data.model.VoteRewardProcess;
 
 import java.util.List;
@@ -14,14 +15,11 @@ public class StarcoinProposalService {
     @Value("${starcoin.get-last-proposal-list-url}")
     private String getLastProposalListUrl;
 
-    @Value("${starcoin.chain-id}")
-    private Integer chainId;
-
-    @Value("${starcoin.network}")
-    private String network;
-
     @Value("${starcoin.vote-reward-name-prefix-format}")
     private String voteRewardNamePrefixFormat;
+
+    @Autowired
+    private StarcoinChainConfig.ChainSettings chainSettings;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -58,7 +56,7 @@ public class StarcoinProposalService {
             name = name.substring(0, VoteRewardProcess.MAX_NAME_LENGTH - 3) + "...";
         }
         voteRewardProcess.setName(name);
-        voteRewardProcess.setChainId(this.chainId);
+        voteRewardProcess.setChainId(this.chainSettings.getChainId());
         voteRewardProcess.setVoteStartTimestamp(proposal.onChainStartTime);
         voteRewardProcess.setVoteEndTimestamp(proposal.onChainEndTime);
         voteRewardProcess.setOnChainDisabled(onChainDisabled);
@@ -75,8 +73,8 @@ public class StarcoinProposalService {
         if (proposal == null) {
             throw new RuntimeException("Cannot get proposal by id(on-chain): " + idOnChain);
         }
-        if (!network.equalsIgnoreCase(proposal.network)) {
-            throw new RuntimeException("Find proposal not in same network. " + this.network + " <> " + proposal.network);
+        if (!this.chainSettings.getNetwork().equalsIgnoreCase(proposal.network)) {
+            throw new RuntimeException("Find proposal not in same network. " + this.chainSettings.getNetwork() + " <> " + proposal.network);
         }
         return proposal;
     }
