@@ -60,8 +60,18 @@ public class VoteRewardProcessService {
     }
 
     public VoteRewardProcess createVoteRewardProcess(VoteRewardProcess src) {
+        if (src.getName() == null || src.getName().isEmpty())
+            throw new IllegalArgumentException("Process name is null.");
+        if (src.getChainId() == null) throw new IllegalArgumentException("Chain Id is null.");
+        if (src.getVoteStartTimestamp() == null)
+            throw new IllegalArgumentException("Start time is null.");
+        if (src.getVoteEndTimestamp() == null)
+            throw new IllegalArgumentException("End time is null.");
         if (src.getName().length() > MAX_NAME_LENGTH)
             throw new IllegalArgumentException("Name is too long.");
+        if (src.getProposalProcessSeqNumber() == null) {
+            throw new IllegalArgumentException("Proposal Process Sequence Number is null.");
+        }
         VoteRewardProcess v = new VoteRewardProcess();
         BeanUtils.copyProperties(src, v);
         v.setProcessId(null);

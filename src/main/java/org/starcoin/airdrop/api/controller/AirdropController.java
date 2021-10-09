@@ -71,13 +71,6 @@ public class AirdropController {
 
     @PostMapping("voteRewardProcesses")
     public VoteRewardProcess postVoteRewardProcess(@RequestBody VoteRewardProcessVO voteRewardProcess) {
-        if (voteRewardProcess.getName() == null || voteRewardProcess.getName().isEmpty())
-            throw new IllegalArgumentException("Process name is null.");
-        if (voteRewardProcess.getChainId() == null) throw new IllegalArgumentException("Chain Id is null.");
-        if (voteRewardProcess.getVoteStartTimestamp() == null)
-            throw new IllegalArgumentException("Start time is null.");
-        if (voteRewardProcess.getVoteEndTimestamp() == null)
-            throw new IllegalArgumentException("End time is null.");
         if (voteRewardProcess.getOnChainDisabled() == null) {
             voteRewardProcess.setOnChainDisabled(true);// default DISABLE on-chain operations!!!
         }
