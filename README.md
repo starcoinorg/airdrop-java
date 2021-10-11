@@ -11,7 +11,7 @@
 示例：
 
 ```shell
-curl -H "Content-Type: application/json" -X POST \
+curl -u {username}:{passwd} -H "Content-Type: application/json" -X POST \
 -d '{"proposalId":29,"proposer":"0x0000000000000000000000000a550c18","name":"TEST-barnard-101","chainId":251,"voteStartTimestamp":1609602653000,"voteEndTimestamp":1631807453000,"onChainDisabled":true}' \
 "http://localhost:8787/v1/airdrops/voteRewardProcesses/"
 ```
@@ -31,7 +31,7 @@ curl -H "Content-Type: application/json" -X POST \
 这是一个例子（注意，这里开始时间与结束时间的参数名称与使用时间戳的时候不一样，并且这里指定的时间值是东八区时间/北京时间）：
 
 ```shell
-curl -H "Content-Type: application/json" -X POST \
+curl -u {username}:{passwd} -H "Content-Type: application/json" -X POST \
 -d '{"proposalId":5,"proposer":"0x3aaf92261930d73cdb24e0cc17e2807a","name":"TEST-main-5-2","chainId":1,"voteStartDateTime":"2021-09-09T14:50:00+08:00","voteEndDateTime":"2021-09-16T15:50:53+08:00","onChainDisabled":true}' \
 "http://localhost:8787/v1/airdrops/voteRewardProcesses/"
 ```
@@ -50,7 +50,7 @@ curl -H "Content-Type: application/json" -X POST \
 一个更简单的创建奖励处理流程的方法，通过 POST 提案 Id 创建处理流程：
 
 ```shell
-curl -H "Content-Type: application/json" -X POST \
+curl -u {username}:{passwd} -H "Content-Type: application/json" -X POST \
 -d '{}' "http://localhost:8787/v1/airdrops/createVoteRewardProcess?proposalId=6&onChainDisabled=true"
 ```
 
@@ -94,7 +94,7 @@ http://localhost:8787/v1/airdrops/exportAirdropJson?processId={processId}
 通过输入 airdrop Id 与空投数据的 root hash 作为参数，revoke 已上链的空投。 例子（假设 airdrop Id 为 12）：
 
 ```shell
-curl -H "Content-Type: application/json" -X POST \
+curl -u {username}:{passwd} -H "Content-Type: application/json" -i -X POST \
 "http://localhost:8787/v1/airdrops/revokeOnChain?airdropId=12&root=0xbcc6b34299c01419d978fbd9ea8c61f37e6bc5e3e4e6c14b917946733bcc87b2"
 ```
 
@@ -106,7 +106,7 @@ curl -H "Content-Type: application/json" -X POST \
 也可以通过 process Id 来 revoke 链上的空投记录。例子（假设 process Id 为 8）：
 
 ```shell
-curl -H "Content-Type: application/json" -i -X POST \
+curl -u {username}:{passwd} -H "Content-Type: application/json" -i -X POST \
 "http://localhost:8787/v1/airdrops/revokeOnChainByProcessId?processId=8"
 ```
 
@@ -119,7 +119,7 @@ curl -H "Content-Type: application/json" -i -X POST \
 重置出错的处理流程，使其可以被重新处理。
 
 ```shell
-curl -H "Content-Type: application/json" -i -X POST \
+curl -u {username}:{passwd} -H "Content-Type: application/json" -i -X POST \
 -d '{}' "http://localhost:8787/v1/airdrops/resetVoteRewardProcess?processId=25"
 ```
 
