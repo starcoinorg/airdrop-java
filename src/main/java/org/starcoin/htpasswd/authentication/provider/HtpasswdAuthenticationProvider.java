@@ -12,7 +12,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
-import org.starcoin.airdrop.api.controller.AirdropController;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +29,7 @@ import java.util.regex.Pattern;
  */
 public class HtpasswdAuthenticationProvider implements AuthenticationProvider {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AirdropController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HtpasswdAuthenticationProvider.class);
 
     private final Map<String, String> htUsers = new ConcurrentHashMap<String, String>();
 
