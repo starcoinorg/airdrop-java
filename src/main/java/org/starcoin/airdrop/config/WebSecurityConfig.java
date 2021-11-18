@@ -28,6 +28,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/documentation/**").permitAll()
                 .antMatchers("/*-api-doc/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/**").permitAll()
+                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .antMatchers(HttpMethod.HEAD, "/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .httpBasic();
