@@ -16,12 +16,14 @@ spec:
     spec:
       containers:
       - name: airdrop-java
-        image: ghcr.io/starcoinorg/starcoin_airdrop_java:sha-d9d3042
+        image: ghcr.io/starcoinorg/starcoin_airdrop_java:sha-9fde7f7
         ports:
         - containerPort: 8787
         env:
         - name: spring_profiles_active
           value: prod
+        - name: FORMAT_MESSAGES_PATTERN_DISABLE_LOOKUPS
+          value: "true"
         - name: SPRING_SECURITY_HTPASSWD
           valueFrom:
             secretKeyRef:
