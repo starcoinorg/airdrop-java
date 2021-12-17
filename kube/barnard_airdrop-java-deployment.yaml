@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: airdrop-java-barnard
-        image: ghcr.io/starcoinorg/starcoin_airdrop_java:sha-d9d3042
+        image: ghcr.io/starcoinorg/starcoin_airdrop_java:sha-70b9474
         ports:
         - containerPort: 8787
         env:
@@ -24,6 +24,11 @@ spec:
           value: barnard
         - name: FORMAT_MESSAGES_PATTERN_DISABLE_LOOKUPS
           value: "true"
+        - name: SPRING_SECURITY_HTPASSWD
+          valueFrom:
+            secretKeyRef:
+              name: http-basic-auth
+              key: auth
         - name: STARCOIN_MYSQL_URL
           value: "jdbc:mysql://starcoin-db-2.c0bz9kehdvnb.ap-northeast-1.rds.amazonaws.com:3306/airdrop_barnard?useUnicode=true&characterEncoding=utf-8&serverTimezone=UTC"
         - name: STARCOIN_MYSQL_USER
