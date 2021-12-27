@@ -75,7 +75,7 @@ starcoin:
     owner-private-key: ${STARCOIN_AIRDROP_OWNER_PK}
   get-last-proposal-list-url: https://poll-api.starcoin.org/v1/polls/page/main?page=1
   vote-reward-name-prefix-format: "投票#%1$s奖励-"
-
+  vote-reward-name-en-prefix-format: "Award of Poll#%1$s-"
 
 ok:
   http:
