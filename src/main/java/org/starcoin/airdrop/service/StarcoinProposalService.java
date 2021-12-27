@@ -18,6 +18,10 @@ public class StarcoinProposalService {
     @Value("${starcoin.vote-reward-name-prefix-format}")
     private String voteRewardNamePrefixFormat;
 
+
+    @Value("${starcoin.vote-reward-name-en-prefix-format}")
+    private String voteRewardNameEnPrefixFormat;
+
     @Autowired
     private StarcoinChainConfig.ChainSettings chainSettings;
 
@@ -30,7 +34,7 @@ public class StarcoinProposalService {
     }
 
     /**
-     * VoteRewardProcess created with these properties:
+     * New VoteRewardProcess instance using proposal properties. Like this:
      * {
      * "proposalId": 29,
      * "proposer": "0x0000000000000000000000000a550c18",
@@ -44,7 +48,7 @@ public class StarcoinProposalService {
      * @param proposal proposal info.
      * @return created VoteRewardProcess.
      */
-    public VoteRewardProcess createVoteRewardProcess(Proposal proposal, boolean onChainDisabled) {
+    public VoteRewardProcess newVoteRewardProcess(Proposal proposal, boolean onChainDisabled) {
         long proposalProcessSeqNumber = onChainDisabled ? System.currentTimeMillis() : VoteRewardProcess.DEFAULT_PROPOSAL_PROCESS_SEQ_NUMBER;
         VoteRewardProcess voteRewardProcess = new VoteRewardProcess();
         voteRewardProcess.setProposalId(Long.parseLong(proposal.idOnChain));
@@ -55,7 +59,13 @@ public class StarcoinProposalService {
         if (name.length() > VoteRewardProcess.MAX_NAME_LENGTH) {
             name = name.substring(0, VoteRewardProcess.MAX_NAME_LENGTH - 3) + "...";
         }
+        String nameEn = (onChainDisabled ? testNamePrefix : "")
+                + String.format(this.voteRewardNameEnPrefixFormat, proposal.idOnChain) + proposal.titleEn;
+        if (nameEn.length() > VoteRewardProcess.MAX_NAME_EN_LENGTH) {
+            nameEn = nameEn.substring(0, VoteRewardProcess.MAX_NAME_LENGTH - 3) + "...";
+        }
         voteRewardProcess.setName(name);
+        voteRewardProcess.setNameEn(nameEn);
         voteRewardProcess.setChainId(this.chainSettings.getChainId());
         voteRewardProcess.setVoteStartTimestamp(proposal.onChainStartTime);
         voteRewardProcess.setVoteEndTimestamp(proposal.onChainEndTime);

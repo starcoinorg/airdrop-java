@@ -12,6 +12,8 @@ public class VoteRewardProcess {
     public static final Long DEFAULT_PROPOSAL_PROCESS_SEQ_NUMBER = 0L;
 
     public static final int MAX_NAME_LENGTH = 50;
+    public static final int MAX_NAME_EN_LENGTH = 100;
+
     public static final int MAX_MESSAGE_LENGTH = 255;
 
     public static final int CHAIN_ID_MAIN = 1;//1: 'main'
@@ -60,6 +62,10 @@ public class VoteRewardProcess {
 
     @Column(length = 100)
     private String name;
+
+
+    @Column(length = 100)
+    private String nameEn;
 
     @Column(length = 255)
     private String description;
@@ -282,6 +288,14 @@ public class VoteRewardProcess {
         this.proposalProcessSeqNumber = proposalProcessSeqNumber;
     }
 
+    public String getNameEn() {
+        return nameEn;
+    }
+
+    public void setNameEn(String nameEn) {
+        this.nameEn = nameEn;
+    }
+
     @Override
     public String toString() {
         return "VoteRewardProcess{" +
@@ -297,6 +311,7 @@ public class VoteRewardProcess {
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 ", name='" + name + '\'' +
+                ", nameEn='" + nameEn + '\'' +
                 ", description='" + description + '\'' +
                 ", message='" + message + '\'' +
                 ", chainId=" + chainId +

@@ -93,7 +93,7 @@ class AirdropApplicationTests {
         BigInteger maxOnChainProposalId = voteRewardProcessRepository.getMaxOnChainProposalId();
         System.out.println(maxOnChainProposalId);
         StarcoinProposalService.Proposal proposal = starcoinProposalService.getProposalByIdOnChain("6");
-        VoteRewardProcess voteRewardProcess = starcoinProposalService.createVoteRewardProcess(proposal, true);
+        VoteRewardProcess voteRewardProcess = starcoinProposalService.newVoteRewardProcess(proposal, true);
         System.out.println(voteRewardProcess);
         if (true) return;
 
@@ -112,7 +112,8 @@ class AirdropApplicationTests {
         airdropMerkleDistributionService.createAirdropMerkleTreeAndUpdateOnChain(8L, 0L);
         if (true) return;
 
-        Long prjId = airdropProjectService.addProject(1, "Test prj. " + System.currentTimeMillis(), new Date(), new Date());
+        String prjName = "Test prj. " + System.currentTimeMillis();
+        Long prjId = airdropProjectService.addProject(1, prjName, prjName, new Date(), new Date());
         System.out.println(prjId);
         if (true) return;
 

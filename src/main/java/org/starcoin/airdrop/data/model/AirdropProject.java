@@ -29,6 +29,9 @@ public class AirdropProject {
     @Column(nullable = false)
     private String name; // varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '',
 
+    @Column(name = "name_en", length = 100)//varchar(100)
+    private String nameEn;
+
     @Column(name = "token_icon")
     private String tokenIcon = ""; // varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT '',
 
@@ -179,6 +182,15 @@ public class AirdropProject {
         this.updateAt = updateAt;
     }
 
+
+    public String getNameEn() {
+        return nameEn;
+    }
+
+    public void setNameEn(String nameEn) {
+        this.nameEn = nameEn;
+    }
+
     @Override
     public String toString() {
         return "AirdropProject{" +
@@ -186,6 +198,7 @@ public class AirdropProject {
                 ", token='" + token + '\'' +
                 ", networkVersion=" + networkVersion +
                 ", name='" + name + '\'' +
+                ", nameEn='" + nameEn + '\'' +
                 ", tokenIcon='" + tokenIcon + '\'' +
                 ", tokenSymbol='" + tokenSymbol + '\'' +
                 ", tokenPrecision=" + tokenPrecision +
@@ -199,4 +212,5 @@ public class AirdropProject {
                 ", updateAt=" + updateAt +
                 '}';
     }
+
 }

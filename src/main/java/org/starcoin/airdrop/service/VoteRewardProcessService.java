@@ -109,7 +109,7 @@ public class VoteRewardProcessService {
         Date claimRewardStartTime = new Date(v.getVoteEndTimestamp());//new Date(v.getVoteStartTimestamp());
         Date claimRewardEndTime = new Date(v.getVoteEndTimestamp() + CLAIM_REWARD_TIME_LIMIT_MILLISECONDS);
         Long airdropId = onChain
-                ? airdropProjectService.addProject(v.getChainId(), v.getName(), claimRewardStartTime, claimRewardEndTime)
+                ? airdropProjectService.addProject(v.getChainId(), v.getName(), v.getNameEn(), claimRewardStartTime, claimRewardEndTime)
                 : NO_AIRDROP_ID;
         ApiMerkleTree apiMerkleTree;
         if (onChain) {
@@ -185,7 +185,7 @@ public class VoteRewardProcessService {
             }
         }
         StarcoinProposalService.Proposal proposal = starcoinProposalService.getProposalByIdOnChain(proposalId);
-        VoteRewardProcess voteRewardProcess = starcoinProposalService.createVoteRewardProcess(proposal, onChainDisabled);
+        VoteRewardProcess voteRewardProcess = starcoinProposalService.newVoteRewardProcess(proposal, onChainDisabled);
         //System.out.println(voteRewardProcess);
         return createVoteRewardProcess(voteRewardProcess);
     }
