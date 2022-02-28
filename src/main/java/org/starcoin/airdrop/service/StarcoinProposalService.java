@@ -128,6 +128,16 @@ public class StarcoinProposalService {
     }
 
     public static class Proposal {
+
+        public static final int PROPOSAL_STATE_PENDING = 1;
+        public static final int PROPOSAL_STATE_ACTIVE = 2;
+        public static final int PROPOSAL_STATE_DEFEATED = 3;
+        public static final int PROPOSAL_STATE_AGREED = 4;
+        public static final int PROPOSAL_STATE_QUEUED = 5;
+        public static final int PROPOSAL_STATE_EXECUTABLE = 6;
+        public static final int PROPOSAL_STATE_EXTRACTED = 7;
+
+
         public Long id;
         public String network;
         public String idOnChain;

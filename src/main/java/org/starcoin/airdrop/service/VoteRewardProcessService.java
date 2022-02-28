@@ -17,6 +17,8 @@ import java.util.Date;
 import java.util.List;
 
 import static org.starcoin.airdrop.data.model.VoteRewardProcess.MAX_NAME_LENGTH;
+import static org.starcoin.airdrop.service.StarcoinProposalService.Proposal.PROPOSAL_STATE_ACTIVE;
+import static org.starcoin.airdrop.service.StarcoinProposalService.Proposal.PROPOSAL_STATE_PENDING;
 
 @Service
 public class VoteRewardProcessService {
@@ -179,12 +181,24 @@ public class VoteRewardProcessService {
             BigInteger maxOnChainProposalId = voteRewardProcessRepository.getMaxOnChainProposalId();
             //System.out.println(maxOnChainProposalId);
             if (maxOnChainProposalId != null && maxOnChainProposalId.compareTo(new BigInteger(proposalId)) >= 0) {
-                String msg = "Proposal #" + proposalId + " already has process.";
+                String msg = "Proposal #" + proposalId + " maybe already processed. " +
+                        "Max processed on-chain proposal Id.(" + maxOnChainProposalId + ") >= current proposal Id.(" + proposalId + ").";
                 LOG.error(msg);
                 throw new IllegalArgumentException(msg);
             }
         }
         StarcoinProposalService.Proposal proposal = starcoinProposalService.getProposalByIdOnChain(proposalId);
+        if (proposal.status == null) {
+            String msg = "Cannot get status of Proposal #" + proposalId + ".";
+            LOG.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
+        if (PROPOSAL_STATE_PENDING == proposal.status
+                || PROPOSAL_STATE_ACTIVE == proposal.status) {
+            String msg = "Status of Proposal #" + proposalId + " is " + proposal.status + ", cannot create reward airdrop.";
+            LOG.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
         VoteRewardProcess voteRewardProcess = starcoinProposalService.newVoteRewardProcess(proposal, onChainDisabled);
         //System.out.println(voteRewardProcess);
         return createVoteRewardProcess(voteRewardProcess);
