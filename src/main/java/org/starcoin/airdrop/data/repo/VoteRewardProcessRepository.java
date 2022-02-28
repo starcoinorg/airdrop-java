@@ -23,4 +23,6 @@ public interface VoteRewardProcessRepository extends JpaRepository<VoteRewardPro
             "LIMIT 1;", nativeQuery = true)
     BigInteger getMaxOnChainProposalId();
 
+    VoteRewardProcess findFirstByProposalIdAndOnChainDisabled(Long proposalId, boolean onChainDisabled);
+
 }

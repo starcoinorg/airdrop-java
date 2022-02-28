@@ -6,7 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
+import org.starcoin.airdrop.data.model.ProposalToBeAirdropped;
 import org.starcoin.airdrop.data.model.VoteRewardProcess;
+import org.starcoin.airdrop.data.repo.ProposalToBeAirdroppedRepository;
 import org.starcoin.airdrop.service.AirdropMerkleDistributionService;
 import org.starcoin.airdrop.service.VoteRewardProcessService;
 import org.starcoin.airdrop.service.VoteRewardService;
@@ -34,6 +36,9 @@ public class AirdropController {
 
     @Resource
     private AirdropMerkleDistributionService airdropMerkleDistributionService;
+
+    @Resource
+    private ProposalToBeAirdroppedRepository proposalToBeAirdroppedRepository;
 
     @GetMapping("voteRewardProcesses/{processId}")
     public VoteRewardProcess getVoteRewardProcess(@PathVariable("processId") Long processId) {
@@ -149,4 +154,8 @@ public class AirdropController {
         writer.close();
     }
 
+    @GetMapping("proposalsNotAirdropped")
+    public List<ProposalToBeAirdropped> getProposalsNotAirdropped() {
+        return proposalToBeAirdroppedRepository.findProposalsNotAirdropped();
+    }
 }

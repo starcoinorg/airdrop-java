@@ -129,6 +129,16 @@ curl -u {username}:{passwd} -H "Content-Type: application/json" -i -X POST \
 
 注意：该接口需要在排查出之前流程处理出错的原因（比如链上账户余额不足），解决问题（比如给链上账户充值）之后再调用。
 
+
+### 获取待空投奖励的提案列表
+
+查看待空投奖励的投票提案（这些投票的状态为 7 - EXTRACTED，或者当前时间已经超过 endTime）：
+
+```shell
+curl http://localhost:8787/v1/airdrops/proposalsNotAirdropped
+```
+
+
 ### 更多 API 描述
 
 见 Swagger UI：
