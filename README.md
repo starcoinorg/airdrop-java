@@ -132,12 +132,16 @@ curl -u {username}:{passwd} -H "Content-Type: application/json" -i -X POST \
 
 ### 获取待空投奖励的提案列表
 
-查看待空投奖励的投票提案（这些投票的状态为 7 - EXTRACTED，或者当前时间已经超过 endTime）：
+查看待空投奖励的提案：
 
 ```shell
 curl http://localhost:8787/v1/airdrops/proposalsNotAirdropped
 ```
+接口只返回符合以下条件的提案：
 
+* 未空投过的；并且：
+    * 提案状态不是 1 - PENDING 也不是 2 - ACTIVE；
+    * 提案的状态为 7 - EXTRACTED 或者当前时间已经超过 endTime。
 
 ### 更多 API 描述
 
