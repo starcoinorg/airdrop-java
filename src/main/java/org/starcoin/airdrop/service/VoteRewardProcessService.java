@@ -108,8 +108,8 @@ public class VoteRewardProcessService {
         voteRewardRepository.deactiveVoteRewardsByProposalId(v.getProposalId());
         processVoteRewards(v, events);
         boolean onChain = v.getOnChainDisabled() == null || !v.getOnChainDisabled(); // default is on-chain.
-        Date claimRewardStartTime = new Date(v.getVoteEndTimestamp());//new Date(v.getVoteStartTimestamp());
-        Date claimRewardEndTime = new Date(v.getVoteEndTimestamp() + CLAIM_REWARD_TIME_LIMIT_MILLISECONDS);
+        Date claimRewardStartTime = new Date(System.currentTimeMillis());//new Date(v.getVoteEndTimestamp());//new Date(v.getVoteStartTimestamp());
+        Date claimRewardEndTime = new Date(System.currentTimeMillis() + CLAIM_REWARD_TIME_LIMIT_MILLISECONDS);//new Date(v.getVoteEndTimestamp() + CLAIM_REWARD_TIME_LIMIT_MILLISECONDS);
         Long airdropId = onChain
                 ? airdropProjectService.addProject(v.getChainId(), v.getName(), v.getNameEn(), claimRewardStartTime, claimRewardEndTime)
                 : NO_AIRDROP_ID;
