@@ -10,8 +10,8 @@ import java.util.List;
 @Builder(toBuilder = true)
 @Data
 public class ApiMerkleProof {
-  private String address;
-  private long index;
-  private BigInteger amount;
-  private List<String> proof;
+    private String address;
+    private long index;
+    private BigInteger amount;
+    private List<String> proof;
 }

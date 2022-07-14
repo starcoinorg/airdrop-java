@@ -14,11 +14,11 @@ import java.math.BigInteger;
 @Data
 public class CSVRecord {
 
-  @CsvBindByName(column = "address", required = true)
-  private String address;
-  @CsvBindByName(column = "amount", required = true)
-  private BigInteger amount;
-  private long index;
+    @CsvBindByName(column = "address", required = true)
+    private String address;
+    @CsvBindByName(column = "amount", required = true)
+    private BigInteger amount;
+    private long index;
 
 
 }

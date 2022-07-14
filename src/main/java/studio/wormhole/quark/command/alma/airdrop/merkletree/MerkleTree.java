@@ -6,27 +6,43 @@ import java.util.List;
 
 public class MerkleTree {
 
+    //private List<MerkleNode> nodes;
+    private final List<MerkleNode> leaves;
     private MerkleNode root;
-    private List<MerkleNode> nodes;
-    private List<MerkleNode> leaves;
 
     public MerkleTree() {
-        this.nodes = new ArrayList<>();
+        //this.nodes = new ArrayList<>();
         this.leaves = new ArrayList<>();
+    }
+
+    public static boolean verifyAudit(MerkleHash rootHash, MerkleHash leafHash, List<MerkleProofHash> auditTrail) {
+        if (auditTrail.size() <= 0) throw new InvalidParameterException("Audit trail cannot be empty!");
+
+        MerkleHash testHash = leafHash;
+
+        for (MerkleProofHash auditHash : auditTrail) {
+            testHash = auditHash.direction == MerkleProofHash.Branch.RIGHT
+                    ? MerkleHash.create(testHash, auditHash.hash)
+                    : MerkleHash.create(auditHash.hash, testHash);
+        }
+
+        return testHash.equals(rootHash);
     }
 
     public List<MerkleNode> getLeaves() {
         return leaves;
     }
-    public List<MerkleNode> getNodes() {
-        return nodes;
-    }
+
+    //    public List<MerkleNode> getNodes() {
+    //        return nodes;
+    //    }
+
     public MerkleNode getRoot() {
         return root;
     }
 
     public MerkleNode appendLeaf(MerkleNode node) {
-        this.nodes.add(node);
+        //this.nodes.add(node);
         this.leaves.add(node);
         return node;
     }
@@ -89,20 +105,6 @@ public class MerkleTree {
         }
 
         return auditTrail;
-    }
-
-    public static boolean verifyAudit(MerkleHash rootHash, MerkleHash leafHash, List<MerkleProofHash> auditTrail) {
-        if (auditTrail.size() <= 0) throw new InvalidParameterException("Audit trail cannot be empty!");
-
-        MerkleHash testHash = leafHash;
-
-        for (MerkleProofHash auditHash : auditTrail) {
-            testHash = auditHash.direction == MerkleProofHash.Branch.RIGHT
-                    ? MerkleHash.create(testHash, auditHash.hash)
-                    : MerkleHash.create(auditHash.hash, testHash);
-        }
-
-        return testHash.equals(rootHash);
     }
 
     private MerkleNode findLeaf(MerkleHash hash) {
